@@ -19,6 +19,8 @@ final class InitCommand extends Command
         $this->components->info('Initializing Prasmanan Opinionated Stack...');
 
         $this->setupEnvironment();
+        $this->setupReverbKeys();
+        $this->setupVapidKeys();
         $this->setupEnvExample();
         $this->setupPackageJson();
         $this->setupConfigs();
@@ -52,6 +54,55 @@ final class InitCommand extends Command
             $content = preg_replace('/^LOG_STACK=single$/m', 'LOG_STACK=daily', $content);
             
             return File::put($envPath, $content) !== false;
+        });
+    }
+
+    private function setupReverbKeys(): void
+    {
+        $envPath = base_path('.env');
+        if (! File::exists($envPath)) {
+            return;
+        }
+
+        $this->components->task('Generating Reverb keys...', function () use ($envPath) {
+            $content = File::get($envPath);
+            $modified = false;
+
+            $replacements = [
+                '/^REVERB_APP_ID=$/m' => 'REVERB_APP_ID=' . random_int(100000, 999999),
+                '/^REVERB_APP_KEY=$/m' => 'REVERB_APP_KEY=' . bin2hex(random_bytes(10)),
+                '/^REVERB_APP_SECRET=$/m' => 'REVERB_APP_SECRET=' . bin2hex(random_bytes(15)),
+            ];
+
+            foreach ($replacements as $pattern => $replacement) {
+                if (preg_match($pattern, $content)) {
+                    $content = preg_replace($pattern, $replacement, $content);
+                    $modified = true;
+                }
+            }
+
+            return $modified ? File::put($envPath, $content) !== false : true;
+        });
+    }
+
+    private function setupVapidKeys(): void
+    {
+        $envPath = base_path('.env');
+        if (! File::exists($envPath)) {
+            return;
+        }
+
+        $content = File::get($envPath);
+        if (str_contains($content, 'VAPID_PUBLIC_KEY=') && ! empty(trim(explode('=', explode("\n", substr($content, strpos($content, 'VAPID_PUBLIC_KEY=')))[0])[1] ?? ''))) {
+            // Check if it's really set (not just the key name)
+            preg_match('/^VAPID_PUBLIC_KEY=(.+)$/m', $content, $matches);
+            if (! empty($matches[1])) {
+                return;
+            }
+        }
+
+        $this->components->task('Generating VAPID keys...', function () {
+            return $this->callSilent('webpush:vapid') === 0;
         });
     }
 

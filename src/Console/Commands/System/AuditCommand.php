@@ -83,6 +83,7 @@ final class AuditCommand extends Command
             'pwa-icons-copy.js' => 'PWA Icons Copy',
             'pwa-vite.config.ts' => 'PWA Vite Helper',
             'resources/icons/lucide' => 'Lucide Icons Path',
+            'public/pwa/icons/logo.png' => 'PWA Logo Icon',
         ];
 
         foreach ($files as $path => $label) {
