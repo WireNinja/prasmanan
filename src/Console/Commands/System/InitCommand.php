@@ -28,6 +28,8 @@ final class InitCommand extends Command
         $this->setupMigrations();
         $this->setupBroadcasting();
         $this->setupBootstrap();
+        $this->setupSchedules();
+        $this->setupStorageLink();
         $this->setupLanguage();
 
         $this->newLine();
@@ -237,6 +239,68 @@ final class InitCommand extends Command
             }
 
             return File::put($path, $content) !== false;
+        });
+    }
+
+    private function setupSchedules(): void
+    {
+        $path = base_path('routes/console.php');
+        if (! File::exists($path)) {
+            return;
+        }
+
+        $this->components->task('Setting up backup schedules in routes/console.php...', function () use ($path) {
+            $content = File::get($path);
+
+            $schedules = [
+                'use WireNinja\Prasmanan\Console\Schedules\BackupAssetsSchedule;',
+                'use WireNinja\Prasmanan\Console\Schedules\BackupDatabaseSchedule;',
+                'use WireNinja\Prasmanan\Console\Schedules\CleanupBackupSchedule;',
+                '',
+                "BackupDatabaseSchedule::make()->dailyAt('02:00')->runInBackground();",
+                "BackupAssetsSchedule::make()->dailyAt('02:00')->runInBackground();",
+                "CleanupBackupSchedule::make()->daily()->runInBackground();",
+            ];
+
+            foreach ($schedules as $line) {
+                if (! str_contains($content, $line)) {
+                    $content = $this->injectScheduleLine($content, $line);
+                }
+            }
+
+            return File::put($path, $content) !== false;
+        });
+    }
+
+    private function injectScheduleLine(string $content, string $line): string
+    {
+        if (str_contains($line, 'use ')) {
+            // Inject after the last use statement or after <?php
+            if (preg_match_all('/^use\s+.*;/m', $content, $matches)) {
+                $lastUse = end($matches[0]);
+                return str_replace($lastUse, $lastUse . "\n" . $line, $content);
+            }
+            return str_replace("<?php\n", "<?php\n\n" . $line . "\n", $content);
+        }
+
+        // Inject before Artisan::command
+        if (str_contains($content, 'Artisan::command')) {
+            return str_replace('Artisan::command', $line . "\n\nArtisan::command", $content);
+        }
+
+        return $content . "\n" . $line . "\n";
+    }
+
+    private function setupStorageLink(): void
+    {
+        $this->components->task('Setting up storage link...', function () {
+            $publicStoragePath = public_path('storage');
+
+            if (File::exists($publicStoragePath) || is_link($publicStoragePath)) {
+                @unlink($publicStoragePath);
+            }
+
+            return $this->callSilent('storage:link') === 0;
         });
     }
 
