@@ -30,7 +30,6 @@ final class InitCommand extends Command
         $this->setupMigrations();
         $this->setupBroadcasting();
         $this->setupBootstrap();
-        $this->setupComponents();
         $this->setupSwJs();
         $this->setupSchedules();
         $this->setupStorageLink();
@@ -294,25 +293,6 @@ final class InitCommand extends Command
 
             return File::put($path, $content) !== false;
         });
-    }
-
-    private function setupComponents(): void
-    {
-        $components = [
-            'components/filament-panels/sidebar/group.blade.php.stub' => 'resources/views/components/filament-panels/sidebar/group.blade.php',
-            'components/filament-panels/sidebar/item.blade.php.stub' => 'resources/views/components/filament-panels/sidebar/item.blade.php',
-            'components/filament-panels/layout/base-auth.blade.php.stub' => 'resources/views/components/filament-panels/layout/base-auth.blade.php',
-            'components/turnstile-widget.blade.php.stub' => 'resources/views/components/turnstile-widget.blade.php',
-        ];
-
-        foreach ($components as $stub => $file) {
-            $dest = base_path($file);
-            if (! File::exists($dest) || $this->option('force')) {
-                File::ensureDirectoryExists(dirname($dest));
-                File::copy(PrasmananConstants::stubsDir() . '/' . $stub, $dest);
-                $this->line("  <fg=green>Created</> {$file}");
-            }
-        }
     }
 
     private function setupSwJs(): void

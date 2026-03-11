@@ -19,7 +19,7 @@ final class AuditCommand extends Command
     public function handle(): int
     {
         $isProduction = $this->option('production');
-        
+
         $this->components->info($isProduction ? 'Running Prasmanan Production Readiness Audit...' : 'Running Prasmanan System Health Audit...');
 
         $this->auditFiles();
@@ -43,15 +43,15 @@ final class AuditCommand extends Command
         }
 
         $this->components->info('✓ Audit completed! Your project is in a healthy Prasmanan state.');
-        
+
         return self::SUCCESS;
     }
 
     private function renderTable(): void
     {
         $rows = array_map(function ($row) {
-            $status = $row['status'] === 'OK' 
-                ? '<fg=green>✓ OK</>' 
+            $status = $row['status'] === 'OK'
+                ? '<fg=green>✓ OK</>'
                 : '<fg=red>✗ FAIL</>';
 
             return [
@@ -83,10 +83,6 @@ final class AuditCommand extends Command
             'pwa-icons-copy.js' => 'PWA Icons Copy',
             'pwa-vite-helpers.js' => 'Vite Config Helpers',
             'resources/js/sw.js' => 'PWA Service Worker',
-            'resources/views/components/filament-panels/layout/base-auth.blade.php' => 'Base Auth Layout',
-            'resources/views/components/filament-panels/sidebar/group.blade.php' => 'Sidebar Group',
-            'resources/views/components/filament-panels/sidebar/item.blade.php' => 'Sidebar Item',
-            'resources/views/components/turnstile-widget.blade.php' => 'Turnstile Widget',
             'resources/icons/lucide' => 'Lucide Icons Path',
             'public/pwa/icons/logo.png' => 'PWA Logo Icon',
         ];
@@ -137,7 +133,7 @@ final class AuditCommand extends Command
         }
 
         $content = File::get($envPath);
-        
+
         // Locale
         preg_match('/^APP_LOCALE=(.*)$/m', $content, $matches);
         $locale = $matches[1] ?? 'en';
@@ -184,7 +180,7 @@ final class AuditCommand extends Command
     {
         $file = base_path('routes/channels.php');
         $exists = File::exists($file);
-        
+
         if ($exists) {
             $content = File::get($file);
             $found = str_contains($content, 'PrasmananBroadcast::all()');
@@ -198,7 +194,7 @@ final class AuditCommand extends Command
     {
         $migrationsPath = database_path('migrations');
         $found = false;
-        
+
         if (File::isDirectory($migrationsPath)) {
             $files = File::files($migrationsPath);
             foreach ($files as $file) {
