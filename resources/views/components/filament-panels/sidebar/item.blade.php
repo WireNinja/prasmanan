@@ -109,11 +109,11 @@
                     $childItemUrl = $childItem->getUrl();
                 @endphp
 
-                <x-filament-panels.sidebar.item :active="$isChildActive" :active-child-items="$isChildItemChildItemsActive" :active-icon="$childItemActiveIcon" :badge="$childItemBadge"
+                <x-prasmanan::components.filament-panels.sidebar.item :active="$isChildActive" :active-child-items="$isChildItemChildItemsActive" :active-icon="$childItemActiveIcon" :badge="$childItemBadge"
                     :badge-color="$childItemBadgeColor" :badge-tooltip="$childItemBadgeTooltip" :first="$loop->first" grouped :icon="$childItemIcon" :last="$loop->last"
                     :should-open-url-in-new-tab="$shouldChildItemOpenUrlInNewTab" sub-grouped :sub-navigation="$subNavigation" :url="$childItemUrl">
                     {{ $childItem->getLabel() }}
-                </x-filament-panels.sidebar.item>
+                </x-prasmanan::components.filament-panels.sidebar.item>
             @endforeach
         </ul>
     @endif
