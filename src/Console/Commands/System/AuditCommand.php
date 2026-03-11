@@ -81,8 +81,12 @@ final class AuditCommand extends Command
             'pwa-assets.config.ts' => 'PWA Config Assets',
             'pwa-iconify-fetch.js' => 'Iconify Fetcher',
             'pwa-icons-copy.js' => 'PWA Icons Copy',
-            'pwa-vite.config.ts' => 'PWA Vite Helper',
             'pwa-vite-helpers.js' => 'Vite Config Helpers',
+            'resources/js/sw.js' => 'PWA Service Worker',
+            'resources/views/components/filament-panels/layout/base-auth.blade.php' => 'Base Auth Layout',
+            'resources/views/components/filament-panels/sidebar/group.blade.php' => 'Sidebar Group',
+            'resources/views/components/filament-panels/sidebar/item.blade.php' => 'Sidebar Item',
+            'resources/views/components/turnstile-widget.blade.php' => 'Turnstile Widget',
             'resources/icons/lucide' => 'Lucide Icons Path',
             'public/pwa/icons/logo.png' => 'PWA Logo Icon',
         ];
