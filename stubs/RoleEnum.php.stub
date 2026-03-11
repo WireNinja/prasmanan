@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Enums;
+
+use WireNinja\Prasmanan\Concerns\InteractsWithEnums;
+use WireNinja\Prasmanan\Contracts\ProperFilamentEnum;
+
+enum RoleEnum: string implements ProperFilamentEnum
+{
+    use InteractsWithEnums;
+
+    case SuperAdmin = 'super_admin';
+
+    public function getLabel(): string
+    {
+        return match ($this) {
+            self::SuperAdmin => 'Super Admin',
+        };
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::SuperAdmin => 'danger',
+        };
+    }
+
+    public function getIcon(): string
+    {
+        return match ($this) {
+            self::SuperAdmin => 'lucide-shield-check',
+        };
+    }
+
+    public function getDescription(): ?string
+    {
+        return null;
+    }
+}

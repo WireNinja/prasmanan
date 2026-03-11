@@ -1,0 +1,29 @@
+/**
+ * Copy PWA icons to public root folder
+ * Run: bun copy-pwa-icons.js
+ */
+import { cpSync, readdirSync, existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
+
+const sourceDir = 'public/pwa/icons';
+const targetDir = 'public';
+
+// Ensure source exists
+if (!existsSync(sourceDir)) {
+    console.error(`❌ Source directory not found: ${sourceDir}`);
+    process.exit(1);
+}
+
+// Copy all files from pwa/icons to public root
+const files = readdirSync(sourceDir);
+let copied = 0;
+
+files.forEach(file => {
+    const src = join(sourceDir, file);
+    const dest = join(targetDir, file);
+    cpSync(src, dest, { force: true });
+    console.log(`✓ Copied: ${file}`);
+    copied++;
+});
+
+console.log(`\n✅ Copied ${copied} files to ${targetDir}/`);

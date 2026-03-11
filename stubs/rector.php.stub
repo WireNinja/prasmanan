@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+use WireNinja\Prasmanan\Support\Config\RectorConfigFactory;
+
+/**
+ * Prasmanan Opinionated Rector Configuration
+ * You can extend or override this configuration here.
+ */
+return RectorConfigFactory::configure(__DIR__)
+    ->withSkip([
+        // Add paths or rules to skip here
+    ]);

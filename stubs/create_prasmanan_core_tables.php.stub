@@ -1,0 +1,42 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use WireNinja\Prasmanan\Database\Schema\PrasmananSchema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        // 1. Core Users & Identity
+        PrasmananSchema::createIdentityTables(function (Blueprint $table) {
+            // Anda dapat menyuntikkan field bisnis kustom di sini.
+            // Fitur Identity bawaan (Auth, WebAuthn, Socialite) sepenuhnya dikelola Schema.
+            // Contoh penambahan kolom:
+            // $table->string('nip')->nullable();
+        });
+
+        // 2. Shield (Roles & Permissions)
+        PrasmananSchema::createSecurityTables(); 
+
+        // 3. Activity Log & WebPush & Notifications
+        PrasmananSchema::createSystemLogsAndNotifications();
+
+        // 4. Integrasi bawaan Filament (Media, Import, Export)
+        PrasmananSchema::createFilamentSystemTables();
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        PrasmananSchema::dropFilamentSystemTables();
+        PrasmananSchema::dropSystemLogsAndNotifications();
+        PrasmananSchema::dropSecurityTables();
+        PrasmananSchema::dropIdentityTables();
+    }
+};

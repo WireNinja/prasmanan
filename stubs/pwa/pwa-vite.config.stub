@@ -1,0 +1,117 @@
+import type { VitePWAOptions } from "vite-plugin-pwa";
+
+/**
+ * Vite PWA Configuration
+ *
+ * This file contains all PWA-specific configurations including:
+ * - Service Worker settings
+ * - Web App Manifest
+ * - Icons and assets
+ * - Caching strategies
+ */
+export function getPwaConfig(
+    env: Record<string, string>
+): Partial<VitePWAOptions> {
+    // PWA Icons configuration
+    const manifestIcons = [
+        {
+            src: "/pwa/icons/pwa-64x64.png",
+            sizes: "64x64",
+            type: "image/png",
+        },
+        {
+            src: "/pwa/icons/pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+        },
+        {
+            src: "/pwa/icons/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any",
+        },
+        {
+            src: "/pwa/icons/maskable-icon-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+        },
+    ];
+
+    // Public icons
+    const publicIcons = [
+        { src: "/pwa/icons/favicon.ico" },
+        { src: "/pwa/icons/apple-touch-icon-180x180.png" },
+    ];
+
+    // Additional images to cache (e.g., for og:image)
+    const additionalImages: { src: string; revision?: string }[] = [];
+
+    return {
+        filename: "sw.js",
+        srcDir: "resources/js",
+        scope: "/",
+        base: "/",
+        registerType: "prompt",
+        devOptions: {
+            enabled: env.APP_DEBUG === "true",
+            type: "module",
+        },
+        strategies: "injectManifest",
+        injectRegister: false,
+        outDir: "public", // Output SW to root public/ so it can control scope '/'
+        includeAssets: [],
+        injectManifest: {
+            globDirectory: "public/build",
+            globPatterns: [
+                "**/*.{js,css,html,ico,jpg,png,svg,woff,woff2,ttf,eot}",
+            ],
+            modifyURLPrefix: {
+                "assets/": "/build/assets/",
+            },
+            additionalManifestEntries: [
+                ...manifestIcons.map((i) => ({
+                    url: i.src,
+                    revision: `${Date.now()}`,
+                })),
+                ...publicIcons.map((i) => ({
+                    url: i.src,
+                    revision: `${Date.now()}`,
+                })),
+                ...additionalImages.map((i) => ({
+                    url: i.src,
+                    revision: `${Date.now()}`,
+                })),
+            ],
+            maximumFileSizeToCacheInBytes: 4000000,
+        },
+        manifest: {
+            name: env.VITE_PWA_NAME || env.VITE_APP_NAME || "Laravel App",
+            short_name: env.VITE_PWA_SHORT_NAME || "Laravel",
+            description:
+                env.VITE_PWA_DESCRIPTION || "Laravel Progressive Web App",
+            theme_color: env.VITE_PWA_THEME_COLOR || "#4B5563",
+            background_color: "#ffffff",
+            orientation: "portrait",
+            scope: "/",
+            start_url: "/",
+            display: "standalone",
+            id: "/",
+            icons: [...manifestIcons],
+            shortcuts: [
+                {
+                    name: "Dashboard",
+                    short_name: "Home",
+                    description: "Go to Dashboard",
+                    url: "/",
+                    icons: [
+                        {
+                            src: "/pwa/icons/pwa-192x192.png",
+                            sizes: "192x192",
+                        },
+                    ],
+                },
+            ],
+        },
+    };
+}

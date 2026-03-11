@@ -1,0 +1,14 @@
+/* Global scan sources for Tailwind CSS v4 */
+
+/* Main App & Views */
+@source "../../app/**/*.php";
+@source "../../resources/views/**/*.blade.php";
+@source "../../resources/js/**/*.js";
+
+/* Packages / Monorepo */
+@source "../../packages/prasmanan/src/**/*.php";
+@source "../../packages/prasmanan/resources/views/**/*.blade.php";
+
+/* Laravel & Misc */
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";

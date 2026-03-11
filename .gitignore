@@ -1,0 +1,20 @@
+# Package-specific Ignores
+/vendor/
+composer.lock
+.env
+.env.backup
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+.zed/
+
+# Testing
+.phpunit.result.cache
+.phpunit.cache/
+phpstan-baseline.neon
+
+# Quality Tools
+/.php-cs-fixer.cache
+/.phpstan.cache/
