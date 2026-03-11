@@ -40,6 +40,7 @@ final class PrepareCommand extends Command
         $this->validateMigrations($isCheckOnly);
         $this->validateBootstrap($isCheckOnly);
         $this->validateLangDir($isCheckOnly);
+        $this->validateSvgDir($isCheckOnly);
         $this->cleanupSchedules($isCheckOnly);
 
         if (! $isCheckOnly) {
@@ -394,6 +395,18 @@ final class PrepareCommand extends Command
             } elseif (! $exists) {
                 $this->components->warn("Missing directory: {$dir}");
             }
+        }
+    }
+
+    private function validateSvgDir(bool $isCheckOnly): void
+    {
+        $path = 'resources/svg';
+        $exists = File::isDirectory(base_path($path));
+        if ($isCheckOnly) {
+            $status = $exists ? '✓' : '✗';
+            $this->line("  {$status} Directory: {$path}");
+        } elseif (! $exists) {
+            $this->components->warn("Missing directory: {$path}");
         }
     }
 

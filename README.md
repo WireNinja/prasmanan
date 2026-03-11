@@ -26,6 +26,21 @@ Jalankan perintah persiapan sistem untuk sinkronisasi konfigurasi awal:
 php artisan prasmanan:system-prepare
 ```
 
+### C. Integrasi Self-Healing Hook (Composer)
+
+Sangat disarankan untuk menambahkan hook ini di `composer.json` project kamu agar folder-folder wajib (seperti `resources/svg` untuk BladeIcons) otomatis dibuat jika hilang/belum ada:
+
+```json
+"scripts": {
+    "pre-update-cmd": [
+        "WireNinja\\Prasmanan\\Supports\\ComposerHooks::setup"
+    ],
+    "pre-install-cmd": [
+        "WireNinja\\Prasmanan\\Supports\\ComposerHooks::setup"
+    ]
+}
+```
+
 ---
 
 ## 2. Command Sistem
