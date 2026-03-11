@@ -186,7 +186,8 @@ final class InitCommand extends Command
             'pwa-assets.config.stub' => 'pwa-assets.config.ts',
             'pwa-iconify-fetch.js.stub' => 'pwa-iconify-fetch.js',
             'pwa-icons-copy.js.stub' => 'pwa-icons-copy.js',
-            'pwa-vite.config.stub' => 'pwa-vite.config.ts'
+            'pwa-vite.config.stub' => 'pwa-vite.config.ts',
+            'pwa-vite-helpers.js.stub' => 'pwa-vite-helpers.js'
         ];
 
         foreach ($pwaAssets as $stub => $dest) {

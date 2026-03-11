@@ -82,6 +82,7 @@ final class AuditCommand extends Command
             'pwa-iconify-fetch.js' => 'Iconify Fetcher',
             'pwa-icons-copy.js' => 'PWA Icons Copy',
             'pwa-vite.config.ts' => 'PWA Vite Helper',
+            'pwa-vite-helpers.js' => 'Vite Config Helpers',
             'resources/icons/lucide' => 'Lucide Icons Path',
             'public/pwa/icons/logo.png' => 'PWA Logo Icon',
         ];
