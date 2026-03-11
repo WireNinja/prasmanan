@@ -45,9 +45,11 @@ final class PrepareCommand extends Command
 
         if (! $isCheckOnly) {
             // Existing automated tasks
-            $this->components->task('Running Shield setup...', fn() => $this->callSilent('prasmanan:system-shield') === 0);
+            $this->components->info('Running Shield setup...');
+            $this->call('prasmanan:system-shield');
 
-            $this->components->task('Generating Model Annotations...', fn() => $this->callSilent('prasmanan:model-annotate', ['--all' => true]) === 0);
+            $this->components->info('Generating Model Annotations...');
+            $this->call('prasmanan:model-annotate', ['--all' => true]);
 
             $this->newLine();
             $this->components->info('✓ System preparation completed successfully!');
@@ -351,7 +353,23 @@ final class PrepareCommand extends Command
             $status = $exists ? '✓' : '✗';
             $this->line("  {$status} Core Migration: create_prasmanan_core_tables");
         } elseif (! $exists) {
-            $this->components->warn('Missing core migration: create_prasmanan_core_tables');
+            if ($this->confirm('Missing core migration. Do you want to replace default Laravel users migration with Prasmanan Core Tables?', true)) {
+                // Delete existing users migration
+                foreach ($files as $file) {
+                    if (str_contains($file->getFilename(), 'create_users_table')) {
+                        File::delete($file->getPathname());
+                        $this->line("    <fg=yellow>Deleted</> {$file->getFilename()}");
+                    }
+                }
+
+                // Copy new migration
+                $stub = __DIR__ . '/../../../../stubs/create_prasmanan_core_tables.php.stub';
+                $dest = $migrationsPath . '/0001_01_01_000000_create_prasmanan_core_tables.php';
+                File::copy($stub, $dest);
+                $this->line('    <fg=green>Created</> 0001_01_01_000000_create_prasmanan_core_tables.php');
+            } else {
+                $this->components->warn('Missing core migration: create_prasmanan_core_tables');
+            }
         }
     }
 
