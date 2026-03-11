@@ -63,7 +63,11 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
     public static function initializeFreshProject(Event $event): void
     {
         $baseDir = getcwd();
-        $lockFile = $baseDir . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . '.prasmanan_initialized';
+        $storageDir = $baseDir . DIRECTORY_SEPARATOR . 'storage';
+        if (! is_dir($storageDir)) {
+            @mkdir($storageDir, 0755, true);
+        }
+        $lockFile = $storageDir . DIRECTORY_SEPARATOR . '.prasmanan_initialized';
 
         // Only run initialization once per project.
         if (file_exists($lockFile)) {
@@ -71,17 +75,35 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
         }
 
         // 1. Copy PWA Assets
-        $stubsDir = __DIR__ . '/../../stubs/';
-        $pwaAssets = [
-            'pwa-assets.config.ts',
-            'pwa-iconify-fetch.js',
-            'pwa-icons-copy.js',
-            'pwa-vite.config.ts'
-        ];
+        // Avoid using __DIR__ directly in logic to prevent Composer pre-processing issues
+        $pluginFile = (new \ReflectionClass(static::class))->getFileName();
+        $pluginDir = dirname($pluginFile);
+        $stubsDir = realpath($pluginDir . '/../../stubs');
 
-        foreach ($pwaAssets as $asset) {
-            if (! file_exists($baseDir . '/' . $asset) && file_exists($stubsDir . 'pwa/' . $asset)) {
-                @copy($stubsDir . 'pwa/' . $asset, $baseDir . '/' . $asset);
+        if ($stubsDir) {
+            $pwaAssets = [
+                'pwa-assets.config.stub' => 'pwa-assets.config.ts',
+                'pwa-iconify-fetch.js.stub' => 'pwa-iconify-fetch.js',
+                'pwa-icons-copy.js.stub' => 'pwa-icons-copy.js',
+                'pwa-vite.config.stub' => 'pwa-vite.config.ts'
+            ];
+
+            foreach ($pwaAssets as $stub => $dest) {
+                $stubPath = $stubsDir . '/pwa/' . $stub;
+                $destPath = $baseDir . '/' . $dest;
+                if (! file_exists($destPath) && file_exists($stubPath)) {
+                    @copy($stubPath, $destPath);
+                }
+            }
+
+            // Replace Vite Config
+            $vitePath = $baseDir . '/vite.config.js';
+            $viteStub = $stubsDir . '/vite.config.js.stub';
+            if (file_exists($vitePath) && file_exists($viteStub)) {
+                $currentVite = file_get_contents($vitePath);
+                if (! str_contains($currentVite, 'getViteInputs')) {
+                    @copy($viteStub, $vitePath);
+                }
             }
         }
 
@@ -89,13 +111,19 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
         $packageJsonPath = $baseDir . '/package.json';
         if (file_exists($packageJsonPath)) {
             $packageJson = json_decode(file_get_contents($packageJsonPath), true);
-            if (is_array($packageJson) && ! isset($packageJson['scripts']['pwa:assets'])) {
-                $packageJson['scripts']['iconify:fetch'] = 'bun pwa-iconify-fetch.js';
-                $packageJson['scripts']['pwa:assets'] = 'bun pwa-assets-generator --preset minimal public/favicon.svg';
-                $packageJson['scripts']['pwa:icons'] = 'bun run pwa:iconify && bun run pwa:copy';
-                $packageJson['scripts']['pwa:iconify'] = 'bun pwa-iconify-fetch.js';
-                $packageJson['scripts']['pwa:copy'] = 'bun pwa-icons-copy.js';
-                file_put_contents($packageJsonPath, json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            if (is_array($packageJson)) {
+                $updated = false;
+                if (! isset($packageJson['scripts']['pwa:assets'])) {
+                    $packageJson['scripts']['iconify:fetch'] = 'bun pwa-iconify-fetch.js';
+                    $packageJson['scripts']['pwa:assets'] = 'bun pwa-assets-generator --preset minimal public/favicon.svg';
+                    $packageJson['scripts']['pwa:icons'] = 'bun run pwa:iconify && bun run pwa:copy';
+                    $packageJson['scripts']['pwa:iconify'] = 'bun pwa-iconify-fetch.js';
+                    $packageJson['scripts']['pwa:copy'] = 'bun pwa-icons-copy.js';
+                    $updated = true;
+                }
+                if ($updated) {
+                    file_put_contents($packageJsonPath, json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                }
             }
         }
 
@@ -108,18 +136,10 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
             file_put_contents($envPath, $envCont);
         }
 
-        // 4. Replace Vite Config
-        $vitePath = $baseDir . '/vite.config.js';
-        if (file_exists($vitePath) && ! str_contains(file_get_contents($vitePath), 'getViteInputs')) {
-            if (file_exists($stubsDir . 'vite.config.js.stub')) {
-                @copy($stubsDir . 'vite.config.js.stub', $vitePath);
-            }
-        }
-
         // 5. Create routes/channels.php if missing
         $channelsPath = $baseDir . '/routes/channels.php';
         if (! file_exists($channelsPath)) {
-            file_put_contents(
+            @file_put_contents(
                 $channelsPath,
                 "<?php\n\nuse Illuminate\Support\Facades\Broadcast;\nuse WireNinja\Prasmanan\Facades\PrasmananBroadcast;\n\nPrasmananBroadcast::all();\n"
             );
@@ -129,19 +149,27 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
         $appPath = $baseDir . '/bootstrap/app.php';
         if (file_exists($appPath)) {
             $appContent = file_get_contents($appPath);
+            
+            // Safer injection for withChannels
             if (! str_contains($appContent, 'withChannels')) {
-                // inject withChannels: __DIR__.'/../routes/channels.php' after commands: __DIR__.'/../routes/console.php',
-                $appContent = preg_replace(
-                    '/commands:\s*__DIR__\.\'\/..\/routes\/console\.php\',/m',
-                    "commands: __DIR__.'/../routes/console.php',\n        channels: __DIR__.'/../routes/channels.php',",
-                    $appContent
-                );
+                $search = "commands: __DIR__.'/../routes/console.php',";
+                $replace = $search . "\n        channels: __DIR__.'/../routes/channels.php',";
+                if (str_contains($appContent, $search)) {
+                    $appContent = str_replace($search, $replace, $appContent);
+                } else {
+                    // fallback to more generic match
+                    $appContent = preg_replace(
+                        '/commands:\s*__DIR__\.\'\/..\/routes\/console\.php\',?/m',
+                        "commands: __DIR__.'/../routes/console.php',\n        channels: __DIR__.'/../routes/channels.php',",
+                        $appContent
+                    );
+                }
             }
 
+            // Exception handling
             if (! str_contains($appContent, 'dontReportForGuestUser')) {
-                // inject exception handling
                 $appContent = preg_replace(
-                    '/withExceptions\(function\s*\(\w+\s*\$exceptions\)\s*\{/m',
+                    '/withExceptions\(function\s*\(Exceptions\s*\$exceptions\)\s*\{/m',
                     "withExceptions(function (Exceptions \$exceptions) {\n        \WireNinja\Prasmanan\Supports\PrasmananExceptions::dontReportForGuestUser(\$exceptions);",
                     $appContent
                 );
@@ -152,8 +180,8 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
         // 7. Execute Artisan commands safely
         $artisanPath = $baseDir . '/artisan';
         if (file_exists($artisanPath)) {
-            @exec("php $artisanPath lang:add id");
-            @exec("php $artisanPath lang:update");
+            @exec("php $artisanPath lang:add id > /dev/null 2>&1");
+            @exec("php $artisanPath lang:update > /dev/null 2>&1");
         }
 
         // Mark as initialized
