@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WireNinja\Prasmanan;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -127,6 +128,8 @@ final class PrasmananServiceProvider extends ServiceProvider
     private function bootViews(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'prasmanan');
+
+        Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'prasmanan');
     }
 
     private function bootLivewireComponents(): void

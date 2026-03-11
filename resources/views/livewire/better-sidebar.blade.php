@@ -127,7 +127,7 @@
                             @endphp
 
                             <li>
-                                <x-prasmanan::components.filament-panels.sidebar.group :active="$isGroupActive" :collapsible="$isGroupCollapsible" :icon="$groupIcon"
+                                <x-prasmanan::filament-panels.sidebar.group :active="$isGroupActive" :collapsible="$isGroupCollapsible" :icon="$groupIcon"
                                     :items="$groupItems" :label="$groupLabel" :attributes="\Filament\Support\prepare_inherited_attributes(
                                         $groupExtraSidebarAttributeBag,
                                     )" />

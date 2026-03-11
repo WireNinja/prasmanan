@@ -29,7 +29,7 @@
     };
 @endphp
 
-<x-prasmanan::components.filament-panels.layout.base-auth :livewire="$livewire">
+<x-prasmanan::filament-panels.layout.base-auth :livewire="$livewire">
     <div class="flex min-h-screen w-full bg-gray-50">
 
         {{-- KIRI: Bagian Kosong / Dekoratif --}}
@@ -86,4 +86,4 @@
 
         </div>
     </div>
-</x-prasmanan::components.filament-panels.layout.base-auth>
+</x-prasmanan::filament-panels.layout.base-auth>

@@ -151,7 +151,7 @@
                 }
             @endphp
 
-            <x-prasmanan::components.filament-panels.sidebar.item :active="$isItemActive" :active-child-items="$isItemChildItemsActive" :active-icon="$itemActiveIcon" :badge="$itemBadge"
+            <x-prasmanan::filament-panels.sidebar.item :active="$isItemActive" :active-child-items="$isItemChildItemsActive" :active-icon="$itemActiveIcon" :badge="$itemBadge"
                 :badge-color="$itemBadgeColor" :badge-tooltip="$itemBadgeTooltip" :child-items="$itemChildItems" :first="$loop->first" :grouped="filled($label)"
                 :icon="$itemIcon" :last="$loop->last" :should-open-url-in-new-tab="$shouldItemOpenUrlInNewTab" :sidebar-collapsible="$sidebarCollapsible" :sub-navigation="$subNavigation"
                 :url="$itemUrl">
