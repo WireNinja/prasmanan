@@ -83,6 +83,8 @@ final class AuditCommand extends Command
             'pwa-icons-copy.js' => 'PWA Icons Copy',
             'pwa-vite-helpers.js' => 'Vite Config Helpers',
             'resources/js/sw.js' => 'PWA Service Worker',
+            'app/Providers/Filament/AdminPanelProvider.php' => 'Admin Panel Provider',
+            'resources/css/filament/admin/theme.css' => 'Admin Panel Theme',
             'resources/icons/lucide' => 'Lucide Icons Path',
             'public/pwa/icons/logo.png' => 'PWA Logo Icon',
         ];

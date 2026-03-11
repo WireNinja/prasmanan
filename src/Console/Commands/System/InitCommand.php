@@ -30,6 +30,7 @@ final class InitCommand extends Command
         $this->setupMigrations();
         $this->setupBroadcasting();
         $this->setupBootstrap();
+        $this->setupFilament();
         $this->setupSwJs();
         $this->setupSchedules();
         $this->setupStorageLink();
@@ -293,6 +294,36 @@ final class InitCommand extends Command
 
             return File::put($path, $content) !== false;
         });
+    }
+
+    private function setupFilament(): void
+    {
+        $this->components->task('Installing Filament components...', function () {
+            return $this->callSilent('filament:install', [
+                '--panels' => true,
+                '--no-interaction' => true,
+                '--force' => true,
+            ]) === 0;
+        });
+
+        $this->setupAdminPanel();
+    }
+
+    private function setupAdminPanel(): void
+    {
+        $files = [
+            'css/filament/admin/theme.css.stub' => 'resources/css/filament/admin/theme.css',
+            'providers/AdminPanelProvider.php.stub' => 'app/Providers/Filament/AdminPanelProvider.php',
+        ];
+
+        foreach ($files as $stub => $file) {
+            $dest = base_path($file);
+            if (! File::exists($dest) || $this->option('force')) {
+                File::ensureDirectoryExists(dirname($dest));
+                File::copy(PrasmananConstants::stubsDir() . '/' . $stub, $dest);
+                $this->line("  <fg=green>Created</> {$file}");
+            }
+        }
     }
 
     private function setupSwJs(): void
