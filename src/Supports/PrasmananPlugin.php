@@ -65,7 +65,7 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
             return;
         }
 
-        // Get stubs directory via reflection to be safe from Composer path rewriting
+        // Get stubs directory via reflection
         $reflector = new \ReflectionClass(static::class);
         $stubsDir = dirname($reflector->getFileName()) . '/../../stubs';
 
@@ -80,7 +80,7 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
         foreach ($pwaAssets as $stub => $dest) {
             $src = $stubsDir . '/pwa/' . $stub;
             $dsc = $baseDir . '/' . $dest;
-            if (file_exists($src) && ! file_exists($dsc)) {
+            if (file_exists($src)) {
                 @copy($src, $dsc);
             }
         }
@@ -91,14 +91,12 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
             $content = file_get_contents($packageJsonPath);
             $packageJson = json_decode($content, true);
             if (is_array($packageJson)) {
-                if (! isset($packageJson['scripts']['pwa:assets'])) {
-                    $packageJson['scripts']['iconify:fetch'] = 'bun pwa-iconify-fetch.js';
-                    $packageJson['scripts']['pwa:assets'] = 'bun pwa-assets-generator --preset minimal public/favicon.svg';
-                    $packageJson['scripts']['pwa:icons'] = 'bun run pwa:iconify && bun run pwa:copy';
-                    $packageJson['scripts']['pwa:iconify'] = 'bun pwa-iconify-fetch.js';
-                    $packageJson['scripts']['pwa:copy'] = 'bun pwa-icons-copy.js';
-                    file_put_contents($packageJsonPath, json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-                }
+                $packageJson['scripts']['iconify:fetch'] = 'bun pwa-iconify-fetch.js';
+                $packageJson['scripts']['pwa:assets'] = 'bun pwa-assets-generator --preset minimal public/favicon.svg';
+                $packageJson['scripts']['pwa:icons'] = 'bun run pwa:iconify && bun run pwa:copy';
+                $packageJson['scripts']['pwa:iconify'] = 'bun pwa-iconify-fetch.js';
+                $packageJson['scripts']['pwa:copy'] = 'bun pwa-icons-copy.js';
+                file_put_contents($packageJsonPath, json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
             }
         }
 
@@ -114,11 +112,8 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
         // 4. Replace Vite Config
         $vitePath = $baseDir . '/vite.config.js';
         $viteStub = $stubsDir . '/vite.config.js.stub';
-        if (file_exists($vitePath) && file_exists($viteStub)) {
-            $currentVite = file_get_contents($vitePath);
-            if (! str_contains($currentVite, 'getViteInputs')) {
-                @copy($viteStub, $vitePath);
-            }
+        if (file_exists($viteStub)) {
+            @copy($viteStub, $vitePath);
         }
 
         // 5. Create routes/channels.php
@@ -135,20 +130,22 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
         if (file_exists($appPath)) {
             $appContent = file_get_contents($appPath);
             
-            // Channels registration - using careful str_replace
+            // Channels registration - using regex for robustness
             if (! str_contains($appContent, 'withChannels') && ! str_contains($appContent, 'channels:')) {
-                $search = "commands: __DIR__.'/../routes/console.php',";
-                if (str_contains($appContent, $search)) {
-                    $appContent = str_replace($search, $search . "\n        channels: __DIR__.'/../routes/channels.php',", $appContent);
-                }
+                $appContent = preg_replace(
+                    '/commands:\s*__DIR__\s*\.\s*\'\/..\/routes\/console\.php\',/m',
+                    "commands: __DIR__.'/../routes/console.php',\n        channels: __DIR__.'/../routes/channels.php',",
+                    $appContent
+                );
             }
 
             // Exception handling
             if (! str_contains($appContent, 'dontReportForGuestUser')) {
-                $search = "withExceptions(function (Exceptions \$exceptions) {";
-                if (str_contains($appContent, $search)) {
-                     $appContent = str_replace($search, $search . "\n        \WireNinja\Prasmanan\Supports\PrasmananExceptions::dontReportForGuestUser(\$exceptions);", $appContent);
-                }
+                $appContent = preg_replace(
+                    '/withExceptions\(function\s*\(Exceptions\s*\$exceptions\)\s*\{/m',
+                    "withExceptions(function (Exceptions \$exceptions) {\n        \WireNinja\Prasmanan\Supports\PrasmananExceptions::dontReportForGuestUser(\$exceptions);",
+                    $appContent
+                );
             }
             @file_put_contents($appPath, $appContent);
         }
