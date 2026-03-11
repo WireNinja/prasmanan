@@ -12,6 +12,7 @@ class ComposerHooks
     {
         $directories = [
             'resources/svg',
+            'resources/icons/lucide',
             'resources/css/filament',
             'lang/id',
         ];

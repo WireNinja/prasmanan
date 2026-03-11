@@ -45,9 +45,9 @@ final class PrepareCommand extends Command
 
         if (! $isCheckOnly) {
             // Existing automated tasks
-            $this->components->task('Running Shield setup...', fn () => $this->callSilent('prasmanan:system-shield') === 0);
+            $this->components->task('Running Shield setup...', fn() => $this->callSilent('prasmanan:system-shield') === 0);
 
-            $this->components->task('Generating Model Annotations...', fn () => $this->callSilent('prasmanan:model-annotate', ['--all' => true]) === 0);
+            $this->components->task('Generating Model Annotations...', fn() => $this->callSilent('prasmanan:model-annotate', ['--all' => true]) === 0);
 
             $this->newLine();
             $this->components->info('✓ System preparation completed successfully!');
@@ -200,7 +200,7 @@ final class PrepareCommand extends Command
                 $segments = explode('=', $line, 2);
                 $key = $segments[0];
                 $value = trim($segments[1], '"\' ');
-                
+
                 if (isset($keys[$key])) {
                     $duplicates[] = $key;
                 }
@@ -235,7 +235,7 @@ final class PrepareCommand extends Command
         // Locale & Logging check
         $locale = $values['APP_LOCALE'] ?? 'en';
         $logStack = $values['LOG_STACK'] ?? '';
-        
+
         if ($isCheckOnly) {
             $statusLocale = ($locale === 'id') ? '✓' : '✗';
             $statusLog = str_contains($logStack, 'daily') ? '✓' : '✗';
@@ -254,7 +254,7 @@ final class PrepareCommand extends Command
         if ($isProduction) {
             $this->newLine();
             $this->line('  Production Readiness Details:');
-            
+
             $env = $values['APP_ENV'] ?? 'local';
             $debug = strtolower($values['APP_DEBUG'] ?? 'true');
             $logLevel = strtolower($values['LOG_LEVEL'] ?? 'debug');
