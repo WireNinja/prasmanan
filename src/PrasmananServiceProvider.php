@@ -17,6 +17,7 @@ use WireNinja\Prasmanan\Console\Commands\Scout\ScoutFlushAllCommand;
 use WireNinja\Prasmanan\Console\Commands\Scout\ScoutImportAllCommand;
 use WireNinja\Prasmanan\Console\Commands\Showcase\SendDummyBroadcast;
 use WireNinja\Prasmanan\Console\Commands\System\FormatCommand;
+use WireNinja\Prasmanan\Console\Commands\System\InitCommand;
 use WireNinja\Prasmanan\Console\Commands\System\PrepareCommand;
 use WireNinja\Prasmanan\Console\Commands\System\RefreshCommand;
 use WireNinja\Prasmanan\Console\Commands\System\ShieldCommand;
@@ -95,6 +96,7 @@ final class PrasmananServiceProvider extends ServiceProvider
                 SendDummyBroadcast::class,
                 ShieldCommand::class,
                 PrepareCommand::class,
+                InitCommand::class,
                 RefreshCommand::class,
                 FormatCommand::class,
             ]);
