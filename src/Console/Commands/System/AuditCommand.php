@@ -238,8 +238,8 @@ final class AuditCommand extends Command
         $file = base_path('routes/console.php');
         if (File::exists($file)) {
             $content = File::get($file);
-            $hasLegacy = str_contains($content, 'backup:run') || str_contains($content, 'BackupDatabaseSchedule');
-            $this->addResult('Schedules', 'Legacy Cleanup', ! $hasLegacy, $hasLegacy ? 'Dirty! Contains legacy backup code' : 'Clean');
+            $hasLegacy = str_contains($content, 'backup:run') || str_contains($content, 'Automatically generated Backup Schedules');
+            $this->addResult('Schedules', 'Legacy Cleanup', ! $hasLegacy, $hasLegacy ? 'Dirty! Contains legacy backup comments/commands' : 'Clean');
         }
     }
 }
