@@ -10,21 +10,17 @@ final class RefreshCommand extends Command
 {
     protected $signature = 'prasmanan:system-refresh';
 
-    protected $description = 'Refresh the database and run preparation tasks.';
+    protected $description = 'Refresh the database (migrate:fresh --seed).';
 
     public function handle(): int
     {
         $this->components->warn('Refreshing database (migrate:fresh --seed)...');
 
-        // 1. Migrate Fresh
         $this->call('migrate:fresh', [
             '--seed' => true,
         ]);
 
-        // 2. Run Prepare
-        $this->call('prasmanan:system-prepare');
-
-        $this->components->info('✓ Database refresh and system preparation completed!');
+        $this->components->info('✓ Database refresh completed!');
 
         return self::SUCCESS;
     }

@@ -16,9 +16,10 @@ use WireNinja\Prasmanan\Console\Commands\Pwa\InstallCommand;
 use WireNinja\Prasmanan\Console\Commands\Scout\ScoutFlushAllCommand;
 use WireNinja\Prasmanan\Console\Commands\Scout\ScoutImportAllCommand;
 use WireNinja\Prasmanan\Console\Commands\Showcase\SendDummyBroadcast;
+use WireNinja\Prasmanan\Console\Commands\System\AuditCommand;
+use WireNinja\Prasmanan\Console\Commands\System\EnvSyncCommand;
 use WireNinja\Prasmanan\Console\Commands\System\FormatCommand;
 use WireNinja\Prasmanan\Console\Commands\System\InitCommand;
-use WireNinja\Prasmanan\Console\Commands\System\PrepareCommand;
 use WireNinja\Prasmanan\Console\Commands\System\RefreshCommand;
 use WireNinja\Prasmanan\Console\Commands\System\ShieldCommand;
 use WireNinja\Prasmanan\Livewire\BetterSidebar;
@@ -95,8 +96,9 @@ final class PrasmananServiceProvider extends ServiceProvider
                 PrintCommand::class,
                 SendDummyBroadcast::class,
                 ShieldCommand::class,
-                PrepareCommand::class,
+                AuditCommand::class,
                 InitCommand::class,
+                EnvSyncCommand::class,
                 RefreshCommand::class,
                 FormatCommand::class,
             ]);

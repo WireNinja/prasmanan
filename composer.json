@@ -38,14 +38,16 @@
         "laravel/scout": "^11.0",
         "meilisearch/meilisearch-php": "^1.16",
         "http-interop/http-factory-guzzle": "^1.2",
-        "laravel/reverb": "^1.8"
+        "laravel/reverb": "^1.8",
+        "picqer/php-barcode-generator": "^3.2"
     },
     "require-dev": {
         "composer/composer": "^2.0",
         "rector/rector": "^2.3",
         "larastan/larastan": "^3.0",
         "laravel/pint": "^1.24",
-        "driftingly/rector-laravel": "^2.1"
+        "driftingly/rector-laravel": "^2.1",
+        "laravel/envoy": "^2.10"
     },
     "autoload": {
         "psr-4": {

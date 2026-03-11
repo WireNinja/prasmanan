@@ -19,7 +19,10 @@ final class InitCommand extends Command
         $this->components->info('Initializing Prasmanan Opinionated Stack...');
 
         $this->setupEnvironment();
+        $this->setupEnvExample();
         $this->setupPackageJson();
+        $this->setupConfigs();
+        $this->setupEnums();
         $this->setupPwaAssets();
         $this->setupVite();
         $this->setupMigrations();
@@ -50,6 +53,13 @@ final class InitCommand extends Command
         });
     }
 
+    private function setupEnvExample(): void
+    {
+        $this->components->task('Syncing .env.example...', function () {
+            return $this->callSilent('prasmanan:env-sync', ['--force' => true]) === 0;
+        });
+    }
+
     private function setupPackageJson(): void
     {
         $path = base_path('package.json');
@@ -77,6 +87,44 @@ final class InitCommand extends Command
 
             return File::put($path, json_encode($package, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) !== false;
         });
+    }
+
+    private function setupConfigs(): void
+    {
+        $stubs = [
+            'rector.php' => 'rector.php.stub',
+            'phpstan.neon' => 'phpstan.neon.stub',
+            'resources/css/app.css' => 'css/app.css.stub',
+            'resources/css/sources.css' => 'css/sources.css.stub',
+            'resources/css/pdf.css' => 'css/pdf.css.stub',
+        ];
+
+        foreach ($stubs as $file => $stub) {
+            $dest = base_path($file);
+            if (! File::exists($dest) || $this->option('force')) {
+                File::ensureDirectoryExists(dirname($dest));
+                File::copy(PrasmananConstants::stubsDir() . '/' . $stub, $dest);
+                $this->line("  <fg=green>Created</> {$file}");
+            }
+        }
+    }
+
+    private function setupEnums(): void
+    {
+        $enums = [
+            'app/Enums/PanelEnum.php' => 'PanelEnum.php.stub',
+            'app/Enums/RoleEnum.php' => 'RoleEnum.php.stub',
+            'app/Enums/FilamentResourceEnum.php' => 'FilamentResourceEnum.php.stub',
+        ];
+
+        foreach ($enums as $file => $stub) {
+            $dest = base_path($file);
+            if (! File::exists($dest) || $this->option('force')) {
+                File::ensureDirectoryExists(dirname($dest));
+                File::copy(PrasmananConstants::stubsDir() . '/' . $stub, $dest);
+                $this->line("  <fg=green>Created</> {$file}");
+            }
+        }
     }
 
     private function setupPwaAssets(): void
