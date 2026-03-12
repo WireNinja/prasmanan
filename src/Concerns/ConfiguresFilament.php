@@ -35,7 +35,7 @@ trait ConfiguresFilament
 
     protected function configureFilamentTables(): void
     {
-        Table::configureUsing(fn (Table $table): Table => $table
+        Table::configureUsing(fn(Table $table): Table => $table
             ->paginationMode(PaginationMode::Cursor)
             ->defaultPaginationPageOption(25)
             ->defaultDateDisplayFormat('j F Y')
@@ -84,7 +84,7 @@ trait ConfiguresFilament
                 ->imageEditor()
                 ->preserveFilenames(false)
                 ->maxParallelUploads(10)
-                ->maxSize(config('prasmanan.security.max_file_upload_size'));
+                ->maxSize(fn() => to_int(config('prasmanan.security.max_file_upload_size')) ?? 51200);
         });
     }
 }
