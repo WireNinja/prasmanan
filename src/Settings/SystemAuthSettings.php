@@ -2,11 +2,13 @@
 
 namespace WireNinja\Prasmanan\Settings;
 
-use Illuminate\Support\Facades\Cache;
+use WireNinja\Prasmanan\Concerns\HasCustomCache;
 use Spatie\LaravelSettings\Settings;
 
 class SystemAuthSettings extends Settings
 {
+    use HasCustomCache;
+
     public array $login_split_images;
 
     public bool $login_split_slider_enabled;
@@ -22,24 +24,5 @@ class SystemAuthSettings extends Settings
     public static function group(): string
     {
         return 'system_auth_settings';
-    }
-
-    public function getCustomCacheKey(string $key): string
-    {
-        return 'system_auth_settings::' . $key;
-    }
-
-    public function getCustomCache(string $key): string
-    {
-        $key = $this->getCustomCacheKey($key);
-
-        return Cache::flexible($key, [10, 60], function () use ($key) {
-            // return self::get($key);
-        });
-    }
-
-    public function clearCustomCache(string $key): void
-    {
-        Cache::forget(self::getCustomCacheKey($key));
     }
 }
