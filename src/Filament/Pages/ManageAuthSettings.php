@@ -44,23 +44,49 @@ class ManageAuthSettings extends SettingsPage
                                     ->visible(fn($get) => $get('login_split_slider_enabled')),
                             ]),
 
-                        Repeater::make('login_split_images')
-                            ->label('Split Layout Images')
+                        $this->imageRepeater(),
+                    ]),
+
+                Section::make('Authentication Methods')
+                    ->description('Choose which authentication methods are allowed for users to sign in.')
+                    ->icon('lucide-shield-check')
+                    ->schema([
+                        Grid::make(3)
                             ->schema([
-                                FileUpload::make('image_path')
-                                    ->label('Image')
-                                    ->image()
-                                    ->disk('public')
-                                    ->directory('split-auth')
-                                    ->required()
-                                    ->columnSpanFull(),
-                            ])
-                            ->minItems(1)
-                            ->columns(1)
-                            ->grid(3)
-                            ->itemLabel(fn(array $state): ?string => $state['image_path'] ?? null),
+                                Toggle::make('allow_form_base_credential')
+                                    ->label('Form Credentials')
+                                    ->helperText('Allow users to login using username/email and password.')
+                                    ->required(),
+                                Toggle::make('allow_google_auth')
+                                    ->label('Google Auth')
+                                    ->helperText('Allow users to login using Google OAuth.')
+                                    ->required(),
+                                Toggle::make('allow_webauth')
+                                    ->label('WebAuthn / Passkey')
+                                    ->helperText('Allow users to login using Biometrics or Security Keys.')
+                                    ->required(),
+                            ]),
                     ]),
             ]);
+    }
+
+    protected function imageRepeater(): Repeater
+    {
+        return Repeater::make('login_split_images')
+            ->label('Split Layout Images')
+            ->schema([
+                FileUpload::make('image_path')
+                    ->label('Image')
+                    ->image()
+                    ->disk('public')
+                    ->directory('split-auth')
+                    ->required()
+                    ->columnSpanFull(),
+            ])
+            ->minItems(1)
+            ->columns(1)
+            ->grid(3)
+            ->itemLabel(fn(array $state): ?string => $state['image_path'] ?? null);
     }
 
     public static function getNavigationLabel(): string
