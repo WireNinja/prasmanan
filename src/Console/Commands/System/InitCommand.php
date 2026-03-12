@@ -10,7 +10,14 @@ use WireNinja\Prasmanan\Supports\PrasmananConstants;
 
 final class InitCommand extends Command
 {
-    protected $signature = 'prasmanan:init {--force : Overwrite existing files without asking}';
+    protected $signature = 'prasmanan:init 
+        {--core : Initialize core configurations}
+        {--enums : Initialize enums stubs}
+        {--force-enums : Overwrite existing enums}
+        {--pwa : Initialize PWA assets}
+        {--schedules : Setup backup schedules}
+        {--filament : Initialize Filament}
+        {--all-force : Force all operations and overwrite everything}';
 
     protected $description = 'Initialize fresh project with Prasmanan opinionated stack.';
 
@@ -146,6 +153,10 @@ final class InitCommand extends Command
 
     private function setupConfigs(): void
     {
+        if (! $this->option('core') && ! $this->option('all-force')) {
+            return;
+        }
+
         $stubs = [
             'rector.php' => 'rector.php.stub',
             'phpstan.neon' => 'phpstan.neon.stub',
@@ -156,7 +167,7 @@ final class InitCommand extends Command
 
         foreach ($stubs as $file => $stub) {
             $dest = base_path($file);
-            if (! File::exists($dest) || $this->option('force')) {
+            if (! File::exists($dest) || $this->option('all-force')) {
                 File::ensureDirectoryExists(dirname($dest));
                 File::copy(PrasmananConstants::stubsDir().'/'.$stub, $dest);
                 $this->line("  <fg=green>Created</> {$file}");
@@ -166,6 +177,10 @@ final class InitCommand extends Command
 
     private function setupEnums(): void
     {
+        if (! $this->option('enums') && ! $this->option('all-force')) {
+            return;
+        }
+
         $enums = [
             'app/Enums/PanelEnum.php' => 'PanelEnum.php.stub',
             'app/Enums/RoleEnum.php' => 'RoleEnum.php.stub',
@@ -174,16 +189,25 @@ final class InitCommand extends Command
 
         foreach ($enums as $file => $stub) {
             $dest = base_path($file);
-            if (! File::exists($dest) || $this->option('force')) {
-                File::ensureDirectoryExists(dirname($dest));
-                File::copy(PrasmananConstants::stubsDir().'/'.$stub, $dest);
-                $this->line("  <fg=green>Created</> {$file}");
+            $force = $this->option('force-enums') || $this->option('all-force');
+
+            if (File::exists($dest) && ! $force) {
+                $this->components->warn("Skipping {$file} - File already exists. Use --force-enums to overwrite.");
+                continue;
             }
+
+            File::ensureDirectoryExists(dirname($dest));
+            File::copy(PrasmananConstants::stubsDir().'/'.$stub, $dest);
+            $this->line("  <fg=green>Created</> {$file}");
         }
     }
 
     private function setupPwaAssets(): void
     {
+        if (! $this->option('pwa') && ! $this->option('all-force')) {
+            return;
+        }
+
         $pwaAssets = [
             'pwa-assets.config.stub' => 'pwa-assets.config.ts',
             'pwa-iconify-fetch.js.stub' => 'pwa-iconify-fetch.js',
@@ -196,7 +220,7 @@ final class InitCommand extends Command
             $src = PrasmananConstants::stubsDir().'/pwa/'.$stub;
             $dsc = base_path($dest);
 
-            if (File::exists($src) && (! File::exists($dsc) || $this->option('force'))) {
+            if (File::exists($src) && (! File::exists($dsc) || $this->option('all-force'))) {
                 File::copy($src, $dsc);
                 $this->line("  <fg=green>Created</> {$dest}");
             }
@@ -205,6 +229,10 @@ final class InitCommand extends Command
 
     private function setupVite(): void
     {
+        if (! $this->option('core') && ! $this->option('all-force')) {
+            return;
+        }
+
         $vitePath = base_path('vite.config.js');
         $stubPath = PrasmananConstants::stubsDir().'/vite.config.js.stub';
 
@@ -213,11 +241,11 @@ final class InitCommand extends Command
         }
 
         $content = File::get($vitePath);
-        if (str_contains($content, 'getViteInputs') && ! $this->option('force')) {
+        if (str_contains($content, 'getViteInputs') && ! $this->option('all-force')) {
             return;
         }
 
-        if ($this->option('force') || $this->confirm('Overwrite vite.config.js with Prasmanan optimized configuration?', true)) {
+        if ($this->option('all-force') || $this->confirm('Overwrite vite.config.js with Prasmanan optimized configuration?', true)) {
             $this->components->task('Syncing vite.config.js...', function () use ($stubPath, $vitePath) {
                 return File::copy($stubPath, $vitePath);
             });
@@ -226,14 +254,18 @@ final class InitCommand extends Command
 
     private function setupMigrations(): void
     {
-        $migrationsPath = database_path('migrations');
-        $coreMigration = $migrationsPath.'/0000_00_00_000000_create_prasmanan_core_tables.php';
-
-        if (File::exists($coreMigration) && ! $this->option('force')) {
+        if (! $this->option('core') && ! $this->option('all-force')) {
             return;
         }
 
-        if ($this->option('force') || $this->confirm('Replace default Laravel users migration with Prasmanan Core Tables?', true)) {
+        $migrationsPath = database_path('migrations');
+        $coreMigration = $migrationsPath.'/0000_00_00_000000_create_prasmanan_core_tables.php';
+
+        if (File::exists($coreMigration) && ! $this->option('all-force')) {
+            return;
+        }
+
+        if ($this->option('all-force') || $this->confirm('Replace default Laravel users migration with Prasmanan Core Tables?', true)) {
             $this->components->task('Setting up core migrations...', function () use ($migrationsPath, $coreMigration) {
                 // Delete existing users migration
                 $files = File::files($migrationsPath);
@@ -252,8 +284,12 @@ final class InitCommand extends Command
 
     private function setupBroadcasting(): void
     {
+        if (! $this->option('core') && ! $this->option('all-force')) {
+            return;
+        }
+
         $path = base_path('routes/channels.php');
-        if (File::exists($path) && ! $this->option('force')) {
+        if (File::exists($path) && ! $this->option('all-force')) {
             return;
         }
 
@@ -300,6 +336,10 @@ final class InitCommand extends Command
 
     private function setupFilament(): void
     {
+        if (! $this->option('filament') && ! $this->option('all-force')) {
+            return;
+        }
+
         $this->components->task('Installing Filament components...', function () {
             return $this->callSilent('filament:install', [
                 '--panels' => true,
@@ -320,7 +360,7 @@ final class InitCommand extends Command
 
         foreach ($files as $stub => $file) {
             $dest = base_path($file);
-            if (! File::exists($dest) || $this->option('force')) {
+            if (! File::exists($dest) || $this->option('all-force')) {
                 File::ensureDirectoryExists(dirname($dest));
                 File::copy(PrasmananConstants::stubsDir().'/'.$stub, $dest);
                 $this->line("  <fg=green>Created</> {$file}");
@@ -330,8 +370,12 @@ final class InitCommand extends Command
 
     private function setupSwJs(): void
     {
+        if (! $this->option('pwa') && ! $this->option('all-force')) {
+            return;
+        }
+
         $dest = base_path('resources/js/sw.js');
-        if (! File::exists($dest) || $this->option('force')) {
+        if (! File::exists($dest) || $this->option('all-force')) {
             File::ensureDirectoryExists(dirname($dest));
             File::copy(PrasmananConstants::stubsDir().'/js/sw.js.stub', $dest);
             $this->line('  <fg=green>Created</> resources/js/sw.js');
@@ -340,6 +384,10 @@ final class InitCommand extends Command
 
     private function setupSchedules(): void
     {
+        if (! $this->option('schedules') && ! $this->option('all-force')) {
+            return;
+        }
+
         $path = base_path('routes/console.php');
         if (! File::exists($path)) {
             return;
