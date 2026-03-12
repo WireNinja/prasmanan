@@ -12,5 +12,8 @@ return new class extends SettingsMigration
         ]);
         $this->migrator->add('system_auth_settings.login_split_slider_enabled', true);
         $this->migrator->add('system_auth_settings.login_split_slider_interval', 5000);
+        $this->migrator->add('system_auth_settings.allow_form_base_credential', true);
+        $this->migrator->add('system_auth_settings.allow_google_auth', false);
+        $this->migrator->add('system_auth_settings.allow_webauth', false);
     }
 };
