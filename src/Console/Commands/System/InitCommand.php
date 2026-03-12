@@ -52,7 +52,7 @@ final class InitCommand extends Command
 
         $this->newLine();
         $this->components->info('✓ Prasmanan initialization completed!');
-        $this->components->info('Next step: Run "php artisan prasmanan:system-prepare" to verify.');
+        $this->components->info('Next step: Run "php artisan prasmanan:audit" to verify project health.');
 
         return self::SUCCESS;
     }
