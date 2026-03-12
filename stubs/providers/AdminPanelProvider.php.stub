@@ -15,6 +15,7 @@ class AdminPanelProvider extends PanelProvider
             ->setDefaultConfiguration()
             ->injectMultiFactorAuthentication()
             ->injectShieldPlugin()
+            ->injectAuthSettingsPage()
             ->build();
     }
 }
