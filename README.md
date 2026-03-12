@@ -20,7 +20,13 @@
 
     _Syncs .env, .env.example, package.json, Vite, CSS, Enums, and Core Migrations._
 
-3. **Verify Health**
+3. **Publish Configuration** (Optional)
+    ```bash
+    php artisan vendor:publish --tag=prasmanan-config
+    ```
+    _Allows overriding default behaviors in `config/prasmanan.php`._
+
+4. **Verify Health**
     ```bash
     php artisan prasmanan:audit
     ```
