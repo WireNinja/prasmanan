@@ -56,11 +56,17 @@
 ## Blade Directives
 For non-Filament pages (e.g. landing pages or custom layouts), you can use these directives to inject Prasmanan features:
 
-- **PWA Assets & SW Registration**: 
+- **PWA Assets**: 
     ```blade
     @prasmananPwa
     ```
-    _Place this inside your `<head>` tag. It injects manifest, meta tags, icons, and registers `/sw.js`._
+    _Place this inside your `<head>` tag. It injects manifest, meta tags, and icons._
+
+- **PWA Service Worker Registration**: 
+    ```blade
+    @prasmananPwaScript
+    ```
+    _Place this before `</body>`. It registers `/sw.js`. **Note**: Skip this if you already register it via `@vite` (e.g. `import './pwa'`)._
 
 - **Real-time Broadcasting**:
     ```blade

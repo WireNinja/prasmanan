@@ -114,6 +114,10 @@ final class PrasmananServiceProvider extends ServiceProvider
             return '<?php echo $__env->make("prasmanan::partials/pwa", \Illuminate\Support\Arr::except(get_defined_vars(), ["__data", "__path"]))->render(); ?>';
         });
 
+        Blade::directive('prasmananPwaScript', function () {
+            return '<?php echo $__env->make("prasmanan::partials/pwa-script", \Illuminate\Support\Arr::except(get_defined_vars(), ["__data", "__path"]))->render(); ?>';
+        });
+
         Blade::directive('prasmananBroadcasting', function () {
             return '<?php echo $__env->make("prasmanan::partials/broadcasting", \Illuminate\Support\Arr::except(get_defined_vars(), ["__data", "__path"]))->render(); ?>';
         });
