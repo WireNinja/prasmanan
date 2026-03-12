@@ -36,6 +36,9 @@
         {{-- Hidden di mobile, 50% width di desktop --}}
         @php
             $settingsClass = config('prasmanan.filament.app_settings');
+            if (is_array($settingsClass)) {
+                $settingsClass = $settingsClass[0] ?? null;
+            }
             $settings = $settingsClass ? app($settingsClass) : null;
             $images = $settings?->login_split_images ?? [
                 ['image_path' => 'https://picsum.photos/1080/1920?random=1'],
