@@ -6,6 +6,7 @@ namespace WireNinja\Prasmanan\Console\Commands\System;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use WireNinja\Prasmanan\Support\PrasmananRegistry;
 
 final class AuditCommand extends Command
 {
@@ -23,6 +24,7 @@ final class AuditCommand extends Command
 
         $this->auditFiles();
         $this->auditConfig();
+        $this->auditVendors();
         $this->auditEnums();
         $this->auditEnvironment($isProduction);
         $this->auditVite();
@@ -127,6 +129,27 @@ final class AuditCommand extends Command
         foreach ($enums as $file => $label) {
             $exists = File::exists(base_path($file));
             $this->addResult('Enums', $label, $exists, $exists ? 'File found' : 'Missing Enum');
+        }
+    }
+
+    private function auditVendors(): void
+    {
+        $reconfigured = PrasmananRegistry::getReconfiguredVendors();
+
+        foreach ($reconfigured as $name) {
+            $userPath = "config/prasmanan/vendors/{$name}.php";
+            $exists = File::exists(base_path($userPath));
+
+            $this->addResultDetailed(
+                'Vendors',
+                "Override: {$name}",
+                $exists ? 'OK' : 'WARN',
+                $exists ? 'Detected in user-land' : 'Registered but file missing'
+            );
+        }
+
+        if (empty($reconfigured)) {
+            $this->addResult('Vendors', 'Customization', true, 'Using all default opinions');
         }
     }
 

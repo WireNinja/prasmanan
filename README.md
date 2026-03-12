@@ -55,4 +55,38 @@
 
 ---
 
+## Advanced Configuration (Eject & Reconfigure)
+
+Prasmanan provides an "Opinionated but Flexible" system for vendor configurations (e.g., Filament Shield).
+
+1. **Eject Vendor Config**
+   Copy the opinionated config to your user-land:
+   ```bash
+   php artisan prasmanan:eject filament-shield
+   ```
+   This creates a file at `config/prasmanan/vendors/filament-shield.php`.
+
+2. **Register Reconfiguration**
+   In your `AppServiceProvider` (or any service provider), use the `InteractsWithPrasmanan` trait and call `reconfigureVendor`:
+
+   ```php
+   namespace App\Providers;
+
+   use Illuminate\Support\ServiceProvider;
+   use WireNinja\Prasmanan\Concerns\InteractsWithPrasmanan;
+
+   class AppServiceProvider extends ServiceProvider
+   {
+       use InteractsWithPrasmanan;
+
+       public function boot(): void
+       {
+           // This will deeply merge your local config with Prasmanan's opinion
+           $this->reconfigureVendor('filament-shield');
+       }
+   }
+   ```
+
+---
+
 _Developed with Passion by WireNinja._

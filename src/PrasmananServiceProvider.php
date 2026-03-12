@@ -21,6 +21,7 @@ use WireNinja\Prasmanan\Console\Commands\System\AuditCommand;
 use WireNinja\Prasmanan\Console\Commands\System\EnvSyncCommand;
 use WireNinja\Prasmanan\Console\Commands\System\FormatCommand;
 use WireNinja\Prasmanan\Console\Commands\System\InitCommand;
+use WireNinja\Prasmanan\Console\Commands\System\EjectCommand;
 use WireNinja\Prasmanan\Console\Commands\System\RefreshCommand;
 use WireNinja\Prasmanan\Console\Commands\System\ShieldCommand;
 use WireNinja\Prasmanan\Livewire\BetterSidebar;
@@ -99,6 +100,7 @@ final class PrasmananServiceProvider extends ServiceProvider
                 ShieldCommand::class,
                 AuditCommand::class,
                 InitCommand::class,
+                EjectCommand::class,
                 EnvSyncCommand::class,
                 RefreshCommand::class,
                 FormatCommand::class,

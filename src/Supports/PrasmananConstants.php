@@ -38,4 +38,12 @@ final class PrasmananConstants
     {
         return self::rootDir().'/database/settings';
     }
+
+    /**
+     * Config Directory
+     */
+    public static function configDir(): string
+    {
+        return self::rootDir().'/config';
+    }
 }
