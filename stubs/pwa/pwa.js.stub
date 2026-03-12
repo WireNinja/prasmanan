@@ -1,0 +1,58 @@
+/**
+ * PWA Service Worker Registration for Laravel
+ *
+ * Registers via Laravel route proxy /sw.js which:
+ * - Serves from /build/sw.js in production
+ * - Proxies to Vite dev server in development
+ * - Adds custom headers (Service-Worker-Allowed: /)
+ */
+
+console.log("🔧 Setting up PWA...");
+
+if ("serviceWorker" in navigator) {
+    console.log("🔧 Service Worker is supported");
+
+    // Register via Laravel proxy route
+    navigator.serviceWorker
+        .register("/sw.js", {
+            scope: "/",
+            type: "module",
+        })
+        .then((registration) => {
+            console.log(
+                "✅ Service Worker registered successfully!",
+                registration.scope,
+            );
+
+            // Handle updates
+            registration.onupdatefound = () => {
+                console.log("🔧 Update found");
+
+                const installingWorker = registration.installing;
+
+                if (installingWorker) {
+                    installingWorker.onstatechange = () => {
+                        console.log("🔧 Update found");
+                        if (
+                            installingWorker.state === "installed" &&
+                            navigator.serviceWorker.controller
+                        ) {
+                            console.log(
+                                "🔄 New content available. It will be used on next visit.",
+                            );
+
+                            // Disabled auto-refresh prompt to prevent interruption
+                            // if (window.confirm('Ada update baru! Refresh halaman?')) {
+                            //     window.location.reload();
+                            // }
+                        }
+                    };
+                }
+            };
+        })
+        .catch((error) => {
+            console.error("❌ Service Worker registration failed:", error);
+        });
+} else {
+    console.error("❌ Service Worker is not supported");
+}
