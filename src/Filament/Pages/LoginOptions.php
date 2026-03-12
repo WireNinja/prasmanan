@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
 use Override;
+use WireNinja\Prasmanan\Settings\SystemAuthSettings;
 
 /**
  * @property-read Action $registerAction
@@ -47,7 +48,8 @@ class LoginOptions extends Login
                         $this->getPasswordFormComponent()
                             ->default(fn() => app()->isLocal() ? 'password' : null),
                         $this->getRememberFormComponent(),
-                    ]),
+                    ])
+                    ->visible(fn(SystemAuthSettings $settings) => $settings->allow_form_base_credential),
 
                 $this->getOAuthSection(),
             ]);
@@ -66,6 +68,7 @@ class LoginOptions extends Login
                     ->color('gray')
                     ->outlined()
                     ->extraAttributes(['class' => 'w-full'])
+                    ->visible(fn(SystemAuthSettings $settings) => $settings->allow_google_auth)
                     ->actionJs(function (): string {
                         $route = route('auth.google.redirect', ['provider' => 'google']);
 
@@ -80,6 +83,7 @@ class LoginOptions extends Login
                     ->color('gray')
                     ->outlined()
                     ->extraAttributes(['class' => 'w-full'])
+                    ->visible(fn(SystemAuthSettings $settings) => $settings->allow_webauth)
                     ->actionJs(
                         // Redirect to standard WebAuthn login route
                         // Ensure you have defined 'webauthn.login' or adjust path
@@ -88,6 +92,7 @@ class LoginOptions extends Login
                             JS
                     ),
             ])
+            ->visible(fn(SystemAuthSettings $settings) => $settings->allow_google_auth || $settings->allow_webauth)
             ->extraAttributes(['class' => 'mt-6']);
     }
 
