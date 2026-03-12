@@ -11,6 +11,8 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use WireNinja\Prasmanan\Settings\SystemAppSettings;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use BackedEnum;
 use UnitEnum;
 
@@ -26,51 +28,76 @@ class ManageAppSettings extends SettingsPage
     {
         return $schema
             ->components([
-                Section::make('Branding')
-                    ->description('Sesuaikan identitas visual aplikasi Anda.')
-                    ->icon('lucide-palette')
+                Grid::make(2)
                     ->schema([
-                        Grid::make(2)
+                        Section::make('Identitas Visual')
+                            ->description('Kustomisasi nama dan logo aplikasi Anda.')
+                            ->icon('lucide-palette')
                             ->schema([
                                 TextInput::make('brand_name')
-                                    ->label('Nama Brand')
-                                    ->required(),
+                                    ->label('Nama Aplikasi / Brand')
+                                    ->placeholder('Prasmanan')
+                                    ->required()
+                                    ->helperText('Nama ini akan muncul di sidebar dan judul halaman.'),
                                 FileUpload::make('brand_logo')
-                                    ->label('Logo Brand')
+                                    ->label('Logo Aplikasi')
                                     ->image()
                                     ->disk('public')
-                                    ->directory('branding'),
-                            ]),
-                    ]),
+                                    ->directory('branding')
+                                    ->helperText('Gunakan format PNG, JPG, atau WebP transparan.'),
+                            ])->columnSpan(1),
 
-                Section::make('Tata Letak & Tema')
-                    ->description('Atur tampilan dan perilaku navigasi panel.')
-                    ->icon('lucide-layout')
-                    ->schema([
-                        Grid::make(2)
+                        Section::make('Tipografi & Tema')
+                            ->description('Pilih font dan atur preferensi tampilan.')
+                            ->icon('lucide-type')
                             ->schema([
                                 Toggle::make('is_dark_mode_enabled')
-                                    ->label('Aktifkan Mode Gelap')
-                                    ->helperText('Izinkan pengguna beralih ke mode gelap.')
+                                    ->label('Aktifkan Tombol Mode Gelap')
+                                    ->helperText('Izinkan pengguna beralih antara mode terang dan gelap.')
                                     ->default(true),
                                 Select::make('custom_font')
-                                    ->label('Font Kustom')
+                                    ->label('Koleksi Google Font')
                                     ->options([
-                                        'IBM Plex Sans' => 'IBM Plex Sans',
-                                        'Inter' => 'Inter',
-                                        'Roboto' => 'Roboto',
-                                        'Outfit' => 'Outfit',
+                                        'IBM Plex Sans' => 'IBM Plex Sans (Standard)',
+                                        'Inter' => 'Inter (Modern)',
+                                        'Roboto' => 'Roboto (Clean)',
+                                        'Open Sans' => 'Open Sans',
+                                        'Montserrat' => 'Montserrat (Premium)',
+                                        'Poppins' => 'Poppins (Soft)',
+                                        'Lato' => 'Lato',
+                                        'Raleway' => 'Raleway',
+                                        'Nunito' => 'Nunito',
+                                        'Outfit' => 'Outfit (Sleek)',
+                                        'Ubuntu' => 'Ubuntu',
+                                        'Kanit' => 'Kanit',
+                                        'Work Sans' => 'Work Sans',
+                                        'Playfair Display' => 'Playfair Display (Elegant)',
+                                        'Oswald' => 'Oswald (Bold)',
                                     ])
-                                    ->default('IBM Plex Sans'),
+                                    ->searchable()
+                                    ->default('IBM Plex Sans')
+                                    ->helperText('Font akan dimuat langsung dari Google Font Provider.'),
+                            ])->columnSpan(1),
+                    ]),
+
+                Section::make('Pengaturan Navigasi Sidebar')
+                    ->description('Sesuaikan perilaku sidebar untuk pengalaman pengguna yang lebih baik.')
+                    ->icon('lucide-layout-panel-left')
+                    ->schema([
+                        Grid::make(3)
+                            ->schema([
                                 TextInput::make('sidebar_width')
-                                    ->label('Lebar Sidebar')
+                                    ->label('Lebar Sidebar Utama')
                                     ->placeholder('350px')
-                                    ->default('350px'),
+                                    ->default('350px')
+                                    ->helperText('Default: 350px. Gunakan satuan px atau rem.'),
                                 Toggle::make('is_sidebar_collapsible_on_desktop')
-                                    ->label('Sidebar Dapat Dilipat di Desktop')
+                                    ->label('Sidebar Collapsible')
+                                    ->helperText('Bisa dilipat ke samping pada tampilan Desktop.')
                                     ->default(true),
                                 Toggle::make('are_navigation_groups_collapsible')
-                                    ->label('Grup Navigasi Dapat Dilipat')
+                                    ->label('Grup Navigasi Collapsible')
+                                    ->helperText('Grup menu bisa dibuka-tutup.')
                                     ->default(true),
                             ]),
                     ]),
@@ -85,5 +112,32 @@ class ManageAppSettings extends SettingsPage
     public function getTitle(): string
     {
         return 'Pengaturan Aplikasi';
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            $this->getClearCacheAction(),
+        ];
+    }
+
+    protected function getClearCacheAction(): Action
+    {
+        return Action::make('clearCache')
+            ->label('Bersihkan Cache')
+            ->color('warning')
+            ->icon('lucide-trash-2')
+            ->requiresConfirmation()
+            ->action(fn () => $this->clearCache());
+    }
+
+    public function clearCache(): void
+    {
+        app(SystemAppSettings::class)->clearAllCustomCaches();
+
+        Notification::make()
+            ->title('Cache Berhasil Dibersihkan')
+            ->success()
+            ->send();
     }
 }

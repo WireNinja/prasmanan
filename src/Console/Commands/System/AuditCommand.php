@@ -31,6 +31,7 @@ final class AuditCommand extends Command
         $this->auditBootstrap();
         $this->auditFolders();
         $this->auditSchedules();
+        $this->auditPhpConfig();
 
         $this->renderTable();
 
@@ -50,9 +51,12 @@ final class AuditCommand extends Command
     private function renderTable(): void
     {
         $rows = array_map(function ($row) {
-            $status = $row['status'] === 'OK'
-                ? '<fg=green>✓ OK</>'
-                : '<fg=red>✗ FAIL</>';
+            $status = match($row['status']) {
+                'OK' => '<fg=green>✓ OK</>',
+                'FAIL' => '<fg=red>✗ FAIL</>',
+                'WARN' => '<fg=yellow>! WARN</>',
+                default => $row['status'],
+            };
 
             return [
                 $row['category'],
@@ -248,5 +252,42 @@ final class AuditCommand extends Command
             $hasLegacy = str_contains($content, 'backup:run') || str_contains($content, 'Automatically generated Backup Schedules');
             $this->addResult('Schedules', 'Legacy Cleanup', ! $hasLegacy, $hasLegacy ? 'Dirty! Contains legacy backup comments/commands' : 'Clean');
         }
+    }
+
+    private function auditPhpConfig(): void
+    {
+        $postMaxSize = ini_get('post_max_size');
+        $uploadMaxFilesize = ini_get('upload_max_filesize');
+
+        $isPostOk = $this->isSizeAtLeast($postMaxSize, 50);
+        $isUploadOk = $this->isSizeAtLeast($uploadMaxFilesize, 50);
+
+        $this->addResultDetailed('Server', 'PHP post_max_size', $isPostOk ? 'OK' : 'WARN', "Current: {$postMaxSize} (Recommended: 50M+)");
+        $this->addResultDetailed('Server', 'PHP upload_max_filesize', $isUploadOk ? 'OK' : 'WARN', "Current: {$uploadMaxFilesize} (Recommended: 50M+)");
+    }
+
+    private function addResultDetailed(string $category, string $component, string $status, string $detail): void
+    {
+        $this->results[] = [
+            'category' => $category,
+            'component' => $component,
+            'status' => $status,
+            'detail' => $detail,
+        ];
+    }
+
+    private function isSizeAtLeast(string $size, int $minMb): bool
+    {
+        $unit = strtoupper(substr($size, -1));
+        $value = (int) substr($size, 0, -1);
+
+        $bytes = match ($unit) {
+            'G' => $value * 1024 * 1024 * 1024,
+            'M' => $value * 1024 * 1024,
+            'K' => $value * 1024,
+            default => (int) $size,
+        };
+
+        return $bytes >= ($minMb * 1024 * 1024);
     }
 }

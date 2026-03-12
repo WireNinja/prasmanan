@@ -33,4 +33,21 @@ trait HasCustomCache
     {
         Cache::forget($this->getCustomCacheKey($key));
     }
+
+    /**
+     * Clear all custom caches for this settings class.
+     */
+    public function clearAllCustomCaches(): void
+    {
+        $reflection = new \ReflectionClass($this);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($properties as $property) {
+            if ($property->isStatic()) {
+                continue;
+            }
+
+            $this->clearCustomCache($property->getName());
+        }
+    }
 }
