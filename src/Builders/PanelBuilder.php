@@ -68,7 +68,7 @@ class PanelBuilder
         $this->panel
             ->id($this->name)
             ->path($this->name)
-            ->viteTheme('resources/css/filament/'.$this->name.'/theme.css')
+            ->viteTheme('resources/css/filament/' . $this->name . '/theme.css')
             ->login($loginPage)
             ->profile(page: $profilePage, isSimple: false)
             ->darkMode($darkMode)
@@ -76,7 +76,7 @@ class PanelBuilder
             ->sidebarLivewireComponent(BetterSidebar::class)
             // ->topbarLivewireComponent(BetterTopbar::class)
             ->globalSearch(false)
-            ->broadcasting(fn () => config('prasmanan.broadcasting.enabled', false))
+            ->broadcasting(fn() => config('prasmanan.broadcasting.enabled', false))
             ->databaseTransactions()
             ->databaseNotifications()
             ->databaseNotificationsPolling(null)
@@ -116,16 +116,18 @@ class PanelBuilder
         if (config('prasmanan.pwa.enabled', true)) {
             $this->panel->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn (): string => Blade::render('@include("prasmanan::partials/pwa")'),
+                fn(): string => Blade::render('@include("prasmanan::partials/pwa")'),
             );
         }
 
         if (config('prasmanan.broadcasting.enabled', false)) {
             $this->panel->renderHook(
                 PanelsRenderHook::BODY_END,
-                fn (): string => Blade::render('@include("prasmanan::partials/broadcasting")'),
+                fn(): string => Blade::render('@include("prasmanan::partials/broadcasting")'),
             );
         }
+
+        $this->panel->pages([]);
 
         if ($spaMode) {
             $this->panel->spa()->spaUrlExceptions($spaUrlExceptions);
@@ -152,7 +154,7 @@ class PanelBuilder
                 ->recoverable()
                 ->recoveryCodeCount($recoveryCodeCount)
                 ->codeWindow($codeWindow),
-        ], isRequired: $isRequired instanceof Closure ? $isRequired : fn (?BaseUser $user): bool => $user?->isSuperAdmin() ?? false);
+        ], isRequired: $isRequired instanceof Closure ? $isRequired : fn(?BaseUser $user): bool => $user?->isSuperAdmin() ?? false);
 
         return $this;
     }
@@ -181,6 +183,20 @@ class PanelBuilder
         return $this;
     }
 
+    public function injectAuthSettingsPage(): static
+    {
+        $settingsPage = config('prasmanan.filament.settings_page');
+
+        if ($settingsPage) {
+            $this->panel->pages([
+                ...$this->panel->getPages(),
+                $settingsPage,
+            ]);
+        }
+
+        return $this;
+    }
+
     public function build(): Panel
     {
         return $this->panel;
@@ -190,7 +206,7 @@ class PanelBuilder
     {
         return strtolower($this->name) === 'admin'
             ? '/'
-            : '/'.Str::studly($this->name).'/';
+            : '/' . Str::studly($this->name) . '/';
     }
 
     private function getNamespaceFor(): string
