@@ -127,7 +127,6 @@ class PanelBuilder
             );
         }
 
-        $this->panel->pages([]);
 
         if ($spaMode) {
             $this->panel->spa()->spaUrlExceptions($spaUrlExceptions);
