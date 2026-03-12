@@ -5,13 +5,6 @@
 @source "../../resources/views/**/*.blade.php";
 @source "../../resources/js/**/*.js";
 
-/* Filament & Livewire (Explicit Scanning) */
-@source "../../app/Filament/**/*.php";
-@source "../../app/Livewire/**/*.php";
-@source "../../resources/views/filament/**/*.blade.php";
-@source "../../resources/views/livewire/**/*.blade.php";
-@source "../../resources/views/components/**/*.blade.php";
-
 /* Packages / Monorepo (Prasmanan Core) */
 @source "../../packages/prasmanan/src/**/*.php";
 @source "../../packages/prasmanan/resources/views/**/*.blade.php";
