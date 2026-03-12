@@ -15,9 +15,14 @@ final class InitCommand extends Command
         {--enums : Initialize enums stubs}
         {--force-enums : Overwrite existing enums}
         {--pwa : Initialize PWA assets}
+        {--force-pwa : Overwrite existing PWA assets}
         {--schedules : Setup backup schedules}
+        {--force-schedules : Overwrite existing schedules}
         {--filament : Initialize Filament}
+        {--force-filament : Overwrite existing Filament configurations}
         {--vendors : Initialize vendor configurations}
+        {--force-vendors : Overwrite existing vendor configurations}
+        {--force-core : Overwrite existing core configurations (Vite, Rector, CSS, etc.)}
         {--all-force : Force all operations and overwrite everything}';
 
     protected $description = 'Initialize fresh project with Prasmanan opinionated stack.';
@@ -169,10 +174,12 @@ final class InitCommand extends Command
 
         foreach ($stubs as $file => $stub) {
             $dest = base_path($file);
-            if (! File::exists($dest) || $this->option('all-force')) {
+            $force = $this->option('force-core') || $this->option('all-force');
+
+            if (! File::exists($dest) || $force) {
                 File::ensureDirectoryExists(dirname($dest));
                 File::copy(PrasmananConstants::stubsDir().'/'.$stub, $dest);
-                $this->line("  <fg=green>Created</> {$file}");
+                $this->line("  <fg=green>".(File::exists($dest) ? 'Updated' : 'Created')."</> {$file}");
             }
         }
     }
@@ -221,10 +228,11 @@ final class InitCommand extends Command
         foreach ($pwaAssets as $stub => $dest) {
             $src = PrasmananConstants::stubsDir().'/pwa/'.$stub;
             $dsc = base_path($dest);
+            $force = $this->option('force-pwa') || $this->option('all-force');
 
-            if (File::exists($src) && (! File::exists($dsc) || $this->option('all-force'))) {
+            if (File::exists($src) && (! File::exists($dsc) || $force)) {
                 File::copy($src, $dsc);
-                $this->line("  <fg=green>Created</> {$dest}");
+                $this->line("  <fg=green>".(File::exists($dsc) ? 'Updated' : 'Created')."</> {$dest}");
             }
         }
     }
@@ -243,11 +251,13 @@ final class InitCommand extends Command
         }
 
         $content = File::get($vitePath);
-        if (str_contains($content, 'getViteInputs') && ! $this->option('all-force')) {
+        $force = $this->option('force-core') || $this->option('all-force');
+
+        if (str_contains($content, 'getViteInputs') && ! $force) {
             return;
         }
 
-        if ($this->option('all-force') || $this->confirm('Overwrite vite.config.js with Prasmanan optimized configuration?', true)) {
+        if ($force || $this->confirm('Overwrite vite.config.js with Prasmanan optimized configuration?', true)) {
             $this->components->task('Syncing vite.config.js...', function () use ($stubPath, $vitePath) {
                 return File::copy($stubPath, $vitePath);
             });
@@ -262,12 +272,13 @@ final class InitCommand extends Command
 
         $migrationsPath = database_path('migrations');
         $coreMigration = $migrationsPath.'/0000_00_00_000000_create_prasmanan_core_tables.php';
+        $force = $this->option('force-core') || $this->option('all-force');
 
-        if (File::exists($coreMigration) && ! $this->option('all-force')) {
+        if (File::exists($coreMigration) && ! $force) {
             return;
         }
 
-        if ($this->option('all-force') || $this->confirm('Replace default Laravel users migration with Prasmanan Core Tables?', true)) {
+        if ($force || $this->confirm('Replace default Laravel users migration with Prasmanan Core Tables?', true)) {
             $this->components->task('Setting up core migrations...', function () use ($migrationsPath, $coreMigration) {
                 // Delete existing users migration
                 $files = File::files($migrationsPath);
@@ -291,7 +302,9 @@ final class InitCommand extends Command
         }
 
         $path = base_path('routes/channels.php');
-        if (File::exists($path) && ! $this->option('all-force')) {
+        $force = $this->option('force-core') || $this->option('all-force');
+
+        if (File::exists($path) && ! $force) {
             return;
         }
 
@@ -362,10 +375,12 @@ final class InitCommand extends Command
 
         foreach ($files as $stub => $file) {
             $dest = base_path($file);
-            if (! File::exists($dest) || $this->option('all-force')) {
+            $force = $this->option('force-filament') || $this->option('all-force');
+
+            if (! File::exists($dest) || $force) {
                 File::ensureDirectoryExists(dirname($dest));
                 File::copy(PrasmananConstants::stubsDir().'/'.$stub, $dest);
-                $this->line("  <fg=green>Created</> {$file}");
+                $this->line("  <fg=green>".(File::exists($dest) ? 'Updated' : 'Created')."</> {$file}");
             }
         }
     }
@@ -377,10 +392,12 @@ final class InitCommand extends Command
         }
 
         $dest = base_path('resources/js/sw.js');
-        if (! File::exists($dest) || $this->option('all-force')) {
+        $force = $this->option('force-pwa') || $this->option('all-force');
+
+        if (! File::exists($dest) || $force) {
             File::ensureDirectoryExists(dirname($dest));
             File::copy(PrasmananConstants::stubsDir().'/js/sw.js.stub', $dest);
-            $this->line('  <fg=green>Created</> resources/js/sw.js');
+            $this->line('  <fg=green>'.(File::exists($dest) ? 'Updated' : 'Created').'</> resources/js/sw.js');
         }
     }
 
@@ -495,14 +512,15 @@ final class InitCommand extends Command
         foreach ($selected as $configName) {
             $src = "{$vendorDir}/{$configName}.php";
             $dest = config_path("{$configName}.php");
+            $force = $this->option('force-vendors') || $this->option('all-force');
 
-            if (File::exists($dest) && ! $this->option('all-force')) {
+            if (File::exists($dest) && ! $force) {
                 $this->components->warn("Skipping {$configName}.php - Already exists.");
                 continue;
             }
 
             File::copy($src, $dest);
-            $this->line("  <fg=green>Created/Updated</> config/{$configName}.php");
+            $this->line("  <fg=green>".(File::exists($dest) ? 'Updated' : 'Created')."</> config/{$configName}.php");
         }
     }
 }
