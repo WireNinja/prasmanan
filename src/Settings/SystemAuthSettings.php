@@ -11,6 +11,12 @@ class SystemAuthSettings extends Settings
     public bool $login_split_slider_enabled;
 
     public int $login_split_slider_interval;
+    
+    public bool $allow_form_base_credential;
+
+    public bool $allow_google_auth;
+
+    public bool $allow_webauth;
 
     public static function group(): string
     {
