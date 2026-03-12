@@ -33,15 +33,4 @@ trait HasCustomCache
     {
         Cache::forget($this->getCustomCacheKey($key));
     }
-    
-    /**
-     * Clear all custom caches for this settings group.
-     * This is useful when the settings are updated.
-     */
-    public function clearAllCustomCaches(): void
-    {
-        // Note: This assumes we know all keys or we use a tag.
-        // For simplicity, we might need a list of keys to clear.
-        // Or just rely on the flexible cache TTL for now.
-    }
 }

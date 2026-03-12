@@ -53,17 +53,6 @@ class PanelBuilder
         $path = $this->getNamespaceIn(); // Contoh: /Sales/ atau /
         $ns = $this->getNamespaceFor();  // Contoh: \Sales\ atau \
 
-        $appSettings = app(SystemAppSettings::class);
-
-        $brandName = $appSettings->getCustomCache('brand_name');
-        $brandLogo = $appSettings->getCustomCache('brand_logo');
-        $darkMode = $appSettings->getCustomCache('is_dark_mode_enabled');
-        $font = $appSettings->getCustomCache('custom_font');
-        $sidebarWidth = $appSettings->getCustomCache('sidebar_width');
-        $sidebarCollapsibleOnDesktop = $appSettings->getCustomCache('is_sidebar_collapsible_on_desktop');
-        $collapsibleNavigationGroups = $appSettings->getCustomCache('are_navigation_groups_collapsible');
-
-        $colors = config('prasmanan.filament.colors', ['primary' => Color::Zinc]);
         $profilePage = config('prasmanan.filament.profile_page', BetterEditProfile::class);
         $loginPage = config('prasmanan.filament.login_page', LoginOptions::class);
         $spaMode = config('prasmanan.filament.spa_mode', true);
@@ -75,12 +64,12 @@ class PanelBuilder
             ->id($this->name)
             ->path($this->name)
             ->viteTheme('resources/css/filament/' . $this->name . '/theme.css')
-            ->brandName($brandName)
-            ->brandLogo($brandLogo)
+            ->brandName(fn (SystemAppSettings $settings) => $settings->getCachedBrandName())
+            ->brandLogo(fn (SystemAppSettings $settings) => $settings->getCachedBrandLogo())
             ->login($loginPage)
             ->profile(page: $profilePage, isSimple: false)
-            ->darkMode($darkMode)
-            ->sidebarWidth($sidebarWidth)
+            ->darkMode(fn (SystemAppSettings $settings) => $settings->isCachedDarkModeEnabled())
+            ->sidebarWidth(fn (SystemAppSettings $settings) => $settings->getCachedSidebarWidth())
             ->sidebarLivewireComponent(BetterSidebar::class)
             // ->topbarLivewireComponent(BetterTopbar::class)
             ->globalSearch(false)
@@ -88,10 +77,13 @@ class PanelBuilder
             ->databaseTransactions()
             ->databaseNotifications()
             ->databaseNotificationsPolling(null)
-            ->colors($colors)
+            ->colors(config('prasmanan.filament.colors', ['primary' => Color::Zinc]))
             ->topbar(false)
             ->maxContentWidth(Width::Full)
-            ->font($font, provider: GoogleFontProvider::class)
+            ->font(
+                fn (SystemAppSettings $settings) => $settings->getCachedCustomFont(),
+                provider: GoogleFontProvider::class
+            )
             ->discoverResources(
                 in: app_path("Filament{$path}Resources"),
                 for: "App\\Filament{$ns}Resources"
@@ -139,13 +131,9 @@ class PanelBuilder
             $this->panel->spa()->spaUrlExceptions($spaUrlExceptions);
         }
 
-        if ($collapsibleNavigationGroups) {
-            $this->panel->collapsibleNavigationGroups();
-        }
+        $this->panel->collapsibleNavigationGroups(fn (SystemAppSettings $settings) => $settings->areCachedNavigationGroupsCollapsible());
 
-        if ($sidebarCollapsibleOnDesktop) {
-            $this->panel->sidebarCollapsibleOnDesktop();
-        }
+        $this->panel->sidebarCollapsibleOnDesktop(fn (SystemAppSettings $settings) => $settings->isCachedSidebarCollapsibleOnDesktop());
 
         return $this;
     }
