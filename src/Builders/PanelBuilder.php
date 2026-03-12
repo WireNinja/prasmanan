@@ -69,6 +69,8 @@ class PanelBuilder
             ->id($this->name)
             ->path($this->name)
             ->viteTheme('resources/css/filament/' . $this->name . '/theme.css')
+            // ->brandName()
+            // ->brandLogo()
             ->login($loginPage)
             ->profile(page: $profilePage, isSimple: false)
             ->darkMode($darkMode)
@@ -126,7 +128,6 @@ class PanelBuilder
                 fn(): string => Blade::render('@include("prasmanan::partials/broadcasting")'),
             );
         }
-
 
         if ($spaMode) {
             $this->panel->spa()->spaUrlExceptions($spaUrlExceptions);
