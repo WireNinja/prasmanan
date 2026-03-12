@@ -11,12 +11,16 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use WireNinja\Prasmanan\Settings\SystemAuthSettings;
+use BackedEnum;
+use UnitEnum;
 
 class ManageAuthSettings extends SettingsPage
 {
     protected static string $settings = SystemAuthSettings::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'lucide-lock';
+    protected static string|BackedEnum|null $navigationIcon = 'lucide-lock';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Pengaturan';
 
     public function form(Schema $schema): Schema
     {
@@ -37,7 +41,7 @@ class ManageAuthSettings extends SettingsPage
                                     ->numeric()
                                     ->step(500)
                                     ->suffix('ms')
-                                    ->visible(fn ($get) => $get('login_split_slider_enabled')),
+                                    ->visible(fn($get) => $get('login_split_slider_enabled')),
                             ]),
 
                         Repeater::make('login_split_images')
@@ -54,18 +58,18 @@ class ManageAuthSettings extends SettingsPage
                             ->minItems(1)
                             ->columns(1)
                             ->grid(3)
-                            ->itemLabel(fn (array $state): ?string => $state['image_path'] ?? null),
+                            ->itemLabel(fn(array $state): ?string => $state['image_path'] ?? null),
                     ]),
             ]);
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Auth Settings';
+        return 'Pengaturan Otentikasi';
     }
 
     public function getTitle(): string
     {
-        return 'Auth Settings';
+        return 'Pengaturan Otentikasi';
     }
 }
