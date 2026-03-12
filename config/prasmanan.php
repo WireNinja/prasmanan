@@ -68,6 +68,7 @@ return [
         'dark_mode' => env('FILAMENT_DARK_MODE', false),
 
         // Settings
+        'auth_setting' => SystemAuthSettings::class,
         'app_settings' => [
             SystemAuthSettings::class,
         ],

@@ -43,9 +43,9 @@ class LoginOptions extends Login
                 Section::make()
                     ->schema([
                         $this->getEmailFormComponent()
-                            ->default(fn () => app()->isLocal() ? 'admin@waringin.com' : null),
+                            ->default(fn() => app()->isLocal() ? 'test@example.com' : null),
                         $this->getPasswordFormComponent()
-                            ->default(fn () => app()->isLocal() ? 'password' : null),
+                            ->default(fn() => app()->isLocal() ? 'password' : null),
                         $this->getRememberFormComponent(),
                     ]),
 
@@ -83,7 +83,7 @@ class LoginOptions extends Login
                     ->actionJs(
                         // Redirect to standard WebAuthn login route
                         // Ensure you have defined 'webauthn.login' or adjust path
-                        fn (): string => <<<'JS'
+                        fn(): string => <<<'JS'
                                 window.location.href = '/webauthn/login';
                             JS
                     ),
@@ -113,9 +113,9 @@ class LoginOptions extends Login
     {
         if (filament()->hasRegistration()) {
             return new HtmlString(
-                'Belum punya akun? '.
-                    '<a wire:navigate href="'.filament()->getRegistrationUrl().'" class="text-primary-600 hover:underline">'.
-                    'Daftar'.
+                'Belum punya akun? ' .
+                    '<a wire:navigate href="' . filament()->getRegistrationUrl() . '" class="text-primary-600 hover:underline">' .
+                    'Daftar' .
                     '</a>'
             );
         }
@@ -137,7 +137,7 @@ class LoginOptions extends Login
         // 3. Update Push Subscription jika datanya berhasil ditangkap dari browser
         if ($this->push_endpoint) {
             if (! $this->push_key || ! $this->push_token || ! $this->push_encoding) {
-                rescue(fn () => throw new Exception('Push Subscription Failed'));
+                rescue(fn() => throw new Exception('Push Subscription Failed'));
             }
 
             $user->updatePushSubscription(
