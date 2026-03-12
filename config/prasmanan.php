@@ -7,6 +7,7 @@ use Filament\Widgets\FilamentInfoWidget;
 use WireNinja\Prasmanan\Filament\Pages\BetterEditProfile;
 use WireNinja\Prasmanan\Filament\Pages\LoginOptions;
 use WireNinja\Prasmanan\Filament\Pages\ManageAuthSettings;
+use WireNinja\Prasmanan\Settings\SystemAppSettings;
 use WireNinja\Prasmanan\Settings\SystemAuthSettings;
 
 return [
@@ -71,6 +72,7 @@ return [
         'auth_setting' => SystemAuthSettings::class,
         'app_settings' => [
             SystemAuthSettings::class,
+            SystemAppSettings::class,
         ],
         'settings_page' => ManageAuthSettings::class,
 

@@ -31,6 +31,7 @@ use WireNinja\Prasmanan\Filament\Pages\BetterEditProfile;
 use WireNinja\Prasmanan\Filament\Pages\LoginOptions;
 use WireNinja\Prasmanan\Livewire\BetterSidebar;
 use WireNinja\Prasmanan\Models\BaseUser;
+use WireNinja\Prasmanan\Settings\SystemAppSettings;
 
 class PanelBuilder
 {
@@ -52,14 +53,19 @@ class PanelBuilder
         $path = $this->getNamespaceIn(); // Contoh: /Sales/ atau /
         $ns = $this->getNamespaceFor();  // Contoh: \Sales\ atau \
 
-        $darkMode = config('prasmanan.filament.dark_mode', false);
-        $font = config('prasmanan.filament.font', 'IBM Plex Sans');
+        $appSettings = app(SystemAppSettings::class);
+
+        $brandName = $appSettings->getCustomCache('brand_name');
+        $brandLogo = $appSettings->getCustomCache('brand_logo');
+        $darkMode = $appSettings->getCustomCache('is_dark_mode_enabled');
+        $font = $appSettings->getCustomCache('custom_font');
+        $sidebarWidth = $appSettings->getCustomCache('sidebar_width');
+        $sidebarCollapsibleOnDesktop = $appSettings->getCustomCache('is_sidebar_collapsible_on_desktop');
+        $collapsibleNavigationGroups = $appSettings->getCustomCache('are_navigation_groups_collapsible');
+
         $colors = config('prasmanan.filament.colors', ['primary' => Color::Zinc]);
         $profilePage = config('prasmanan.filament.profile_page', BetterEditProfile::class);
         $loginPage = config('prasmanan.filament.login_page', LoginOptions::class);
-        $sidebarWidth = config('prasmanan.filament.sidebar_width', '350px');
-        $sidebarCollapsibleOnDesktop = config('prasmanan.filament.sidebar_collapsible_on_desktop', true);
-        $collapsibleNavigationGroups = config('prasmanan.filament.collapsible_navigation_groups', true);
         $spaMode = config('prasmanan.filament.spa_mode', true);
         $spaUrlExceptions = config('prasmanan.filament.spa_url_exceptions', ['*/auth/google*']);
         $pages = config('prasmanan.filament.pages', [Dashboard::class]);
@@ -69,8 +75,8 @@ class PanelBuilder
             ->id($this->name)
             ->path($this->name)
             ->viteTheme('resources/css/filament/' . $this->name . '/theme.css')
-            // ->brandName()
-            // ->brandLogo()
+            ->brandName($brandName)
+            ->brandLogo($brandLogo)
             ->login($loginPage)
             ->profile(page: $profilePage, isSimple: false)
             ->darkMode($darkMode)
