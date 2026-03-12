@@ -12,3 +12,20 @@
 <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('pwa/icons/favicon-32x32.png') }}">
 <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('pwa/icons/favicon-16x16.png') }}">
 <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+
+<!-- PWA Service Worker Registration -->
+@if(config('prasmanan.pwa.enabled', true))
+<script x-data>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                // Registration was successful
+                // console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, function(err) {
+                // registration failed :(
+                // console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+</script>
+@endif

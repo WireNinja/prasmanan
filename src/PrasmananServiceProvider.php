@@ -43,6 +43,7 @@ final class PrasmananServiceProvider extends ServiceProvider
         $this->bootRoutes();
         $this->bootViews();
         $this->bootLivewireComponents();
+        $this->bootBladeDirectives();
         $this->bootConfigurations();
     }
 
@@ -105,6 +106,17 @@ final class PrasmananServiceProvider extends ServiceProvider
     {
         Livewire::component('prasmanan-side-notifications', SideNotifications::class);
         // Livewire::component('prasmanan-better-sidebar', BetterSidebar::class);
+    }
+
+    private function bootBladeDirectives(): void
+    {
+        Blade::directive('prasmananPwa', function () {
+            return '<?php echo $__env->make("prasmanan::partials/pwa", \Illuminate\Support\Arr::except(get_defined_vars(), ["__data", "__path"]))->render(); ?>';
+        });
+
+        Blade::directive('prasmananBroadcasting', function () {
+            return '<?php echo $__env->make("prasmanan::partials/broadcasting", \Illuminate\Support\Arr::except(get_defined_vars(), ["__data", "__path"]))->render(); ?>';
+        });
     }
 
     private function bootConfigurations(): void

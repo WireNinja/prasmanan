@@ -53,6 +53,21 @@
 3. **Commit**: Run `prasmanan:system-format --dirty` before pushing.
 4. **Deploy**: Run `prasmanan:audit --production` for pre-flight check.
 
+## Blade Directives
+For non-Filament pages (e.g. landing pages or custom layouts), you can use these directives to inject Prasmanan features:
+
+- **PWA Assets & SW Registration**: 
+    ```blade
+    @prasmananPwa
+    ```
+    _Place this inside your `<head>` tag. It injects manifest, meta tags, icons, and registers `/sw.js`._
+
+- **Real-time Broadcasting**:
+    ```blade
+    @prasmananBroadcasting
+    ```
+    _Place this before `</body>`. It injects Echo listeners and notification handlers._
+
 ---
 
 _Developed with Passion by WireNinja._
