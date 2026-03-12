@@ -17,6 +17,7 @@ final class InitCommand extends Command
         {--pwa : Initialize PWA assets}
         {--schedules : Setup backup schedules}
         {--filament : Initialize Filament}
+        {--vendors : Initialize vendor configurations}
         {--all-force : Force all operations and overwrite everything}';
 
     protected $description = 'Initialize fresh project with Prasmanan opinionated stack.';
@@ -463,6 +464,10 @@ final class InitCommand extends Command
 
     private function setupVendorConfigs(): void
     {
+        if (! $this->option('vendors') && ! $this->option('all-force')) {
+            return;
+        }
+
         $vendorDir = PrasmananConstants::configDir().'/vendors';
         if (! File::exists($vendorDir)) {
             return;
