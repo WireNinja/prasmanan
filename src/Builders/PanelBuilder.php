@@ -60,6 +60,13 @@ class PanelBuilder
         $pages = config('prasmanan.filament.pages', [Dashboard::class]);
         $widgets = config('prasmanan.filament.widgets', [AccountWidget::class, FilamentInfoWidget::class]);
 
+        /** @var SystemAppSettings $appSettings */
+        $appSettings = app(SystemAppSettings::class);
+        $darkMode = $appSettings->isCachedDarkModeEnabled();
+        $sidebarWidth = $appSettings->getCachedSidebarWidth();
+        $collapsibleNavigationGroups = $appSettings->areCachedNavigationGroupsCollapsible();
+        $sidebarCollapsibleOnDesktop = $appSettings->isCachedSidebarCollapsibleOnDesktop();
+
         $this->panel
             ->id($this->name)
             ->path($this->name)
@@ -68,8 +75,8 @@ class PanelBuilder
             ->brandLogo(fn (SystemAppSettings $settings) => $settings->getCachedBrandLogo())
             ->login($loginPage)
             ->profile(page: $profilePage, isSimple: false)
-            ->darkMode(fn (SystemAppSettings $settings) => $settings->isCachedDarkModeEnabled())
-            ->sidebarWidth(fn (SystemAppSettings $settings) => $settings->getCachedSidebarWidth())
+            ->darkMode($darkMode)
+            ->sidebarWidth($sidebarWidth)
             ->sidebarLivewireComponent(BetterSidebar::class)
             // ->topbarLivewireComponent(BetterTopbar::class)
             ->globalSearch(false)
@@ -131,9 +138,13 @@ class PanelBuilder
             $this->panel->spa()->spaUrlExceptions($spaUrlExceptions);
         }
 
-        $this->panel->collapsibleNavigationGroups(fn (SystemAppSettings $settings) => $settings->areCachedNavigationGroupsCollapsible());
+        if ($collapsibleNavigationGroups) {
+            $this->panel->collapsibleNavigationGroups();
+        }
 
-        $this->panel->sidebarCollapsibleOnDesktop(fn (SystemAppSettings $settings) => $settings->isCachedSidebarCollapsibleOnDesktop());
+        if ($sidebarCollapsibleOnDesktop) {
+            $this->panel->sidebarCollapsibleOnDesktop();
+        }
 
         return $this;
     }
@@ -177,14 +188,14 @@ class PanelBuilder
         return $this;
     }
 
-    public function injectAuthSettingsPage(): static
+    public function injectSettingsPages(): static
     {
-        $settingsPage = config('prasmanan.filament.settings_page');
+        $settingsPages = config('prasmanan.filament.settings_pages', []);
 
-        if ($settingsPage) {
+        if (! empty($settingsPages)) {
             $this->panel->pages([
                 ...$this->panel->getPages(),
-                $settingsPage,
+                ...$settingsPages,
             ]);
         }
 

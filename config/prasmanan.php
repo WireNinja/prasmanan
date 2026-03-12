@@ -6,6 +6,7 @@ use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use WireNinja\Prasmanan\Filament\Pages\BetterEditProfile;
 use WireNinja\Prasmanan\Filament\Pages\LoginOptions;
+use WireNinja\Prasmanan\Filament\Pages\ManageAppSettings;
 use WireNinja\Prasmanan\Filament\Pages\ManageAuthSettings;
 use WireNinja\Prasmanan\Settings\SystemAppSettings;
 use WireNinja\Prasmanan\Settings\SystemAuthSettings;
@@ -74,7 +75,10 @@ return [
             SystemAuthSettings::class,
             SystemAppSettings::class,
         ],
-        'settings_page' => ManageAuthSettings::class,
+        'settings_pages' => [
+            ManageAuthSettings::class,
+            ManageAppSettings::class,
+        ],
 
         // Security & Authentication
         'mfa' => [
