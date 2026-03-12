@@ -21,7 +21,6 @@ use WireNinja\Prasmanan\Console\Commands\System\AuditCommand;
 use WireNinja\Prasmanan\Console\Commands\System\EnvSyncCommand;
 use WireNinja\Prasmanan\Console\Commands\System\FormatCommand;
 use WireNinja\Prasmanan\Console\Commands\System\InitCommand;
-use WireNinja\Prasmanan\Console\Commands\System\EjectCommand;
 use WireNinja\Prasmanan\Console\Commands\System\RefreshCommand;
 use WireNinja\Prasmanan\Console\Commands\System\ShieldCommand;
 use WireNinja\Prasmanan\Livewire\BetterSidebar;
@@ -53,37 +52,6 @@ final class PrasmananServiceProvider extends ServiceProvider
             __DIR__.'/../config/prasmanan.php',
             'prasmanan',
         );
-
-        $vendorConfigs = [
-            'activitylog',
-            'auth-security',
-            'backup',
-            'blade-icons',
-            'broadcasting',
-            'data',
-            'filament-shield',
-            'filament',
-            'horizon',
-            'laravel-pdf',
-            'livewire',
-            'permission',
-            'reverb',
-            'scout',
-            'services',
-            'settings',
-            'webauthn',
-            'webpush',
-        ];
-
-        foreach ($vendorConfigs as $configName) {
-            if (file_exists($filePath = __DIR__."/../config/vendors/{$configName}.php")) {
-                $config = $this->app->make('config');
-                $config->set($configName, array_merge(
-                    $config->get($configName, []),
-                    require $filePath,
-                ));
-            }
-        }
     }
 
     private function registerCommands(): void
@@ -100,7 +68,6 @@ final class PrasmananServiceProvider extends ServiceProvider
                 ShieldCommand::class,
                 AuditCommand::class,
                 InitCommand::class,
-                EjectCommand::class,
                 EnvSyncCommand::class,
                 RefreshCommand::class,
                 FormatCommand::class,

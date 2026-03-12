@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\Users\UserResource;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
 use Filament\Pages\Dashboard;
@@ -187,15 +186,6 @@ return [
                 // 'create',
                 'update',
                 // 'delete',
-            ],
-            UserResource::class => [
-                'viewAny',
-                'view',
-                'create',
-                'update',
-                'delete',
-                'suspend',
-                'unsuspend',
             ],
         ],
         'exclude' => [

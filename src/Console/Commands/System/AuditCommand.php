@@ -6,7 +6,7 @@ namespace WireNinja\Prasmanan\Console\Commands\System;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use WireNinja\Prasmanan\Support\PrasmananRegistry;
+use WireNinja\Prasmanan\Supports\PrasmananConstants;
 
 final class AuditCommand extends Command
 {
@@ -134,22 +134,23 @@ final class AuditCommand extends Command
 
     private function auditVendors(): void
     {
-        $reconfigured = PrasmananRegistry::getReconfiguredVendors();
-
-        foreach ($reconfigured as $name) {
-            $userPath = "config/prasmanan/vendors/{$name}.php";
-            $exists = File::exists(base_path($userPath));
-
-            $this->addResultDetailed(
-                'Vendors',
-                "Override: {$name}",
-                $exists ? 'OK' : 'WARN',
-                $exists ? 'Detected in user-land' : 'Registered but file missing'
-            );
+        $vendorDir = PrasmananConstants::configDir().'/vendors';
+        if (! File::exists($vendorDir)) {
+            $this->addResult('Vendors', 'Integrity', false, 'Prasmanan vendor configuration directory missing');
+            return;
         }
 
-        if (empty($reconfigured)) {
-            $this->addResult('Vendors', 'Customization', true, 'Using all default opinions');
+        $files = File::files($vendorDir);
+        $configs = collect($files)->map(fn ($file) => $file->getBasename('.php'))->sort()->values();
+
+        foreach ($configs as $name) {
+            $exists = File::exists(config_path("{$name}.php"));
+            $this->addResult(
+                'Vendors',
+                "Config: {$name}",
+                $exists,
+                $exists ? 'Detected in config/' : 'Missing in config/ - Not customizable per-project'
+            );
         }
     }
 

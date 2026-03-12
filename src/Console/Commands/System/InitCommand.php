@@ -42,6 +42,7 @@ final class InitCommand extends Command
         $this->setupSchedules();
         $this->setupStorageLink();
         $this->setupLanguage();
+        $this->setupVendorConfigs();
 
         $this->newLine();
         $this->components->info('✓ Prasmanan initialization completed!');
@@ -458,5 +459,45 @@ final class InitCommand extends Command
 
             return true;
         });
+    }
+
+    private function setupVendorConfigs(): void
+    {
+        $vendorDir = PrasmananConstants::configDir().'/vendors';
+        if (! File::exists($vendorDir)) {
+            return;
+        }
+
+        $files = File::files($vendorDir);
+        $configs = collect($files)->map(fn ($file) => $file->getBasename('.php'))->sort()->values()->toArray();
+
+        $selected = $this->components->choice(
+            'Select vendor configurations to setup (space to select, multiple allowed)',
+            array_merge(['[All]', '[None]'], $configs),
+            '[None]',
+            null,
+            true
+        );
+
+        if (in_array('[None]', $selected, true)) {
+            return;
+        }
+
+        if (in_array('[All]', $selected, true)) {
+            $selected = $configs;
+        }
+
+        foreach ($selected as $configName) {
+            $src = "{$vendorDir}/{$configName}.php";
+            $dest = config_path("{$configName}.php");
+
+            if (File::exists($dest) && ! $this->option('all-force')) {
+                $this->components->warn("Skipping {$configName}.php - Already exists.");
+                continue;
+            }
+
+            File::copy($src, $dest);
+            $this->line("  <fg=green>Created/Updated</> config/{$configName}.php");
+        }
     }
 }
