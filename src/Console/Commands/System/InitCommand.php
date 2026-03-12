@@ -22,7 +22,7 @@ final class InitCommand extends Command
         {--force-filament : Overwrite existing Filament configurations}
         {--vendors : Initialize vendor configurations}
         {--force-vendors : Overwrite existing vendor configurations}
-        {--force-core : Overwrite existing core configurations (Vite, Rector, CSS, etc.)}
+        {--force-core : Overwrite existing core configurations (Vite, Rector, PHPStan, Migrations, Channels, and CSS)}
         {--all-force : Force all operations and overwrite everything}';
 
     protected $description = 'Initialize fresh project with Prasmanan opinionated stack.';
