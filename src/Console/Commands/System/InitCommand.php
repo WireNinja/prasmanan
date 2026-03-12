@@ -22,7 +22,9 @@ final class InitCommand extends Command
         {--force-filament : Overwrite existing Filament configurations}
         {--vendors : Initialize vendor configurations}
         {--force-vendors : Overwrite existing vendor configurations}
-        {--force-core : Overwrite existing core configurations (Vite, Rector, PHPStan, Migrations, Channels, and CSS)}
+        {--force-core : Overwrite existing core configurations (Vite, Rector, PHPStan, Migrations, and Channels)}
+        {--css : Initialize CSS configurations}
+        {--force-css : Overwrite existing CSS configurations}
         {--all-force : Force all operations and overwrite everything}';
 
     protected $description = 'Initialize fresh project with Prasmanan opinionated stack.';
@@ -37,6 +39,7 @@ final class InitCommand extends Command
         $this->setupEnvExample();
         $this->setupPackageJson();
         $this->setupConfigs();
+        $this->setupCss();
         $this->setupEnums();
         $this->setupPwaAssets();
         $this->setupVite();
@@ -167,6 +170,27 @@ final class InitCommand extends Command
         $stubs = [
             'rector.php' => 'rector.php.stub',
             'phpstan.neon' => 'phpstan.neon.stub',
+        ];
+
+        foreach ($stubs as $file => $stub) {
+            $dest = base_path($file);
+            $force = $this->option('force-core') || $this->option('all-force');
+
+            if (! File::exists($dest) || $force) {
+                File::ensureDirectoryExists(dirname($dest));
+                File::copy(PrasmananConstants::stubsDir().'/'.$stub, $dest);
+                $this->line("  <fg=green>".(File::exists($dest) ? 'Updated' : 'Created')."</> {$file}");
+            }
+        }
+    }
+
+    private function setupCss(): void
+    {
+        if (! $this->option('css') && ! $this->option('all-force')) {
+            return;
+        }
+
+        $stubs = [
             'resources/css/app.css' => 'css/app.css.stub',
             'resources/css/sources.css' => 'css/sources.css.stub',
             'resources/css/pdf.css' => 'css/pdf.css.stub',
@@ -174,7 +198,7 @@ final class InitCommand extends Command
 
         foreach ($stubs as $file => $stub) {
             $dest = base_path($file);
-            $force = $this->option('force-core') || $this->option('all-force');
+            $force = $this->option('force-css') || $this->option('all-force');
 
             if (! File::exists($dest) || $force) {
                 File::ensureDirectoryExists(dirname($dest));

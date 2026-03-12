@@ -10,6 +10,7 @@ use Filament\Auth\MultiFactor\App\Concerns\InteractsWithAppAuthenticationRecover
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -30,7 +31,7 @@ use WireNinja\Prasmanan\Concerns\MagicGetterSetter;
  * Handles all core traits logically without cluttering the main
  * application's User model. Applications should extend this model.
  */
-abstract class BaseUser extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, WebAuthnAuthenticatable
+abstract class BaseUser extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, WebAuthnAuthenticatable, HasAvatar
 {
     use HasPushSubscriptions;
     use HasRoles;
@@ -67,6 +68,11 @@ abstract class BaseUser extends Authenticatable implements FilamentUser, HasAppA
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->avatar;
     }
 
     public function isSuperAdmin(): bool
