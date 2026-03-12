@@ -9,7 +9,6 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Support\Enums\Size;
 use Filament\Support\Facades\FilamentTimezone;
 use Filament\Tables\Enums\PaginationMode;
@@ -36,7 +35,7 @@ trait ConfiguresFilament
 
     protected function configureFilamentTables(): void
     {
-        Table::configureUsing(fn(Table $table): Table => $table
+        Table::configureUsing(fn (Table $table): Table => $table
             ->paginationMode(PaginationMode::Cursor)
             ->defaultPaginationPageOption(25)
             ->defaultDateDisplayFormat('j F Y')

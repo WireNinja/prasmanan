@@ -226,22 +226,6 @@ final class PrasmananSchema
         });
     }
 
-    public static function createSystemSettingTable(): void
-    {
-        Schema::create('settings', function (Blueprint $table): void {
-            $table->id();
-
-            $table->string('group');
-            $table->string('name');
-            $table->boolean('locked')->default(false);
-            $table->json('payload');
-
-            $table->timestamps();
-
-            $table->unique(['group', 'name']);
-        });
-    }
-
     /**
      * Build Filament Plugin Dependencies (Media, Imports, Exports)
      */
@@ -299,6 +283,21 @@ final class PrasmananSchema
             $table->text('validation_error')->nullable();
             $table->timestampsTz();
         });
+
+        if (!Schema::hasTable('settings')) {
+            Schema::create('settings', function (Blueprint $table): void {
+                $table->id();
+
+                $table->string('group');
+                $table->string('name');
+                $table->boolean('locked')->default(false);
+                $table->json('payload');
+
+                $table->timestamps();
+
+                $table->unique(['group', 'name']);
+            });
+        };
     }
 
     // ===================================
@@ -342,6 +341,7 @@ final class PrasmananSchema
 
     public static function dropFilamentSystemTables(): void
     {
+        DB::table('settings')->truncate();
         Schema::dropIfExists('failed_import_rows');
         Schema::dropIfExists('exports');
         Schema::dropIfExists('imports');

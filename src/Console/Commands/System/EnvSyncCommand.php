@@ -17,16 +17,18 @@ final class EnvSyncCommand extends Command
     public function handle(): int
     {
         $targetPath = base_path('.env.example');
-        $stubPath = PrasmananConstants::stubsDir() . '/.env.example.stub';
+        $stubPath = PrasmananConstants::stubsDir().'/.env.example.stub';
 
         if (! File::exists($stubPath)) {
             $this->components->error('Stub for .env.example missing!');
+
             return self::FAILURE;
         }
 
         if (File::exists($targetPath) && ! $this->option('force')) {
             if (! $this->confirm('.env.example already exists. Overwrite?', false)) {
                 $this->components->info('Sync cancelled.');
+
                 return self::SUCCESS;
             }
         }

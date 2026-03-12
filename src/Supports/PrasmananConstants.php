@@ -20,7 +20,7 @@ final class PrasmananConstants
      */
     public static function rootDir(): string
     {
-        return realpath(__DIR__ . '/../../');
+        return realpath(__DIR__.'/../../');
     }
 
     /**
@@ -28,14 +28,14 @@ final class PrasmananConstants
      */
     public static function stubsDir(): string
     {
-        return self::rootDir() . '/stubs';
+        return self::rootDir().'/stubs';
     }
 
     /**
-     * Resources Configs Directory
+     * Settings Migration Directory
      */
-    public static function configsDir(): string
+    public static function settingsMigrationDir(): string
     {
-        return self::rootDir() . '/resources/configs';
+        return self::rootDir().'/database/settings';
     }
 }

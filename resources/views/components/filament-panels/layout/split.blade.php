@@ -34,21 +34,72 @@
 
         {{-- KIRI: Bagian Kosong / Dekoratif --}}
         {{-- Hidden di mobile, 50% width di desktop --}}
-        <div class="hidden lg:flex w-1/2 relative bg-gray-50 items-center justify-center">
+        @php
+            $settingsClass = config('prasmanan.filament.app_settings');
+            $settings = $settingsClass ? app($settingsClass) : null;
+            $images = $settings?->login_split_images ?? [
+                ['image_path' => 'https://picsum.photos/1080/1920?random=1'],
+                ['image_path' => 'https://picsum.photos/1080/1920?random=2'],
+            ];
+            $isSlider = $settings?->login_split_slider_enabled && count($images) > 1;
+            $interval = $settings?->login_split_slider_interval ?? 5000;
+        @endphp
+
+        <div class="hidden lg:flex w-1/2 relative bg-gray-50 items-center justify-center p-4">
 
             {{-- Hook start ditaruh sini jika ada plugin yang inject script diawal --}}
             {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIMPLE_LAYOUT_START, scopes: $renderHookScopes) }}
 
-            {{-- Image Implementation --}}
-            <img src="{{ asset('images/split/1.webp') }}" alt="Background Decor"
-                class="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 opacity-0"
-                onload="this.classList.remove('opacity-0')" decoding="async" fetchpriority="high">
+            <div class="relative h-full w-full overflow-hidden rounded-3xl shadow-2xl ring-1 ring-gray-950/5 dark:ring-white/10"
+                @if($isSlider)
+                    x-data="{
+                        current: 0,
+                        images: {{ json_encode($images) }},
+                        init() {
+                            setInterval(() => {
+                                this.current = (this.current + 1) % this.images.length;
+                            }, {{ $interval }});
+                        }
+                    }"
+                @endif
+            >
+                @foreach($images as $index => $imageData)
+                    @php
+                        $imagePath = is_array($imageData) ? $imageData['image_path'] : $imageData;
+                    @endphp
+                    <div
+                        class="absolute inset-0 transition-opacity duration-1000"
+                        @if($isSlider)
+                            x-show="current === {{ $index }}"
+                            x-transition:enter="transition ease-out duration-1000"
+                            x-transition:enter-start="opacity-0"
+                            x-transition:enter-end="opacity-100"
+                            x-transition:leave="transition ease-in duration-1000"
+                            x-transition:leave-start="opacity-100"
+                            x-transition:leave-end="opacity-0"
+                        @else
+                            style="{{ $index === 0 ? 'opacity: 1' : 'opacity: 0; pointer-events: none;' }}"
+                        @endif
+                    >
+                        {{-- Image Implementation --}}
+                        <div class="absolute inset-0">
+                            @php
+                                $finalPath = str_starts_with($imagePath, 'http') 
+                                    ? $imagePath 
+                                    : asset('storage/' . $imagePath);
+                            @endphp
+                            <img src="{{ $finalPath }}" alt="Background Decor"
+                                class="h-full w-full object-cover rounded-2xl transition-opacity duration-500"
+                                decoding="async" fetchpriority="high">
+                        </div>
 
-            {{-- Overlay gradient (Opsional: untuk transisi halus jika gambar belum load) --}}
-            {{-- <div class="absolute inset-0 bg-gradient-to-tr from-gray-50 to-transparent dark:from-gray-950"></div> --}}
-
-            {{-- Original Overlay (Tetap dipertahankan untuk dark mode dimming) --}}
-            <div class="absolute inset-0 bg-gray-100/10 dark:bg-gray-900/50 mix-blend-multiply"></div>
+                        {{-- Overlay --}}
+                        <div class="absolute inset-0">
+                            <div class="h-full w-full rounded-2xl bg-gray-100/10 dark:bg-gray-900/50 mix-blend-multiply"></div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
 
         </div>
 

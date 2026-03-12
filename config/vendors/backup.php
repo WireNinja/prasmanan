@@ -1,5 +1,16 @@
 <?php
 
+use Spatie\Backup\Notifications\Notifiable;
+use Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy;
+use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays;
+use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
+use WireNinja\Prasmanan\Notifications\Backup\BackupHasFailedNotification;
+use WireNinja\Prasmanan\Notifications\Backup\BackupWasSuccessfulNotification;
+use WireNinja\Prasmanan\Notifications\Backup\CleanupHasFailedNotification;
+use WireNinja\Prasmanan\Notifications\Backup\CleanupWasSuccessfulNotification;
+use WireNinja\Prasmanan\Notifications\Backup\HealthyBackupWasFoundNotification;
+use WireNinja\Prasmanan\Notifications\Backup\UnhealthyBackupWasFoundNotification;
+
 return [
 
     'backup' => [
@@ -209,19 +220,19 @@ return [
      */
     'notifications' => [
         'notifications' => [
-            \WireNinja\Prasmanan\Notifications\Backup\BackupHasFailedNotification::class => ['mail', 'telegram'],
-            \WireNinja\Prasmanan\Notifications\Backup\UnhealthyBackupWasFoundNotification::class => ['mail', 'telegram'],
-            \WireNinja\Prasmanan\Notifications\Backup\CleanupHasFailedNotification::class => ['mail', 'telegram'],
-            \WireNinja\Prasmanan\Notifications\Backup\BackupWasSuccessfulNotification::class => ['mail', 'telegram'],
-            \WireNinja\Prasmanan\Notifications\Backup\HealthyBackupWasFoundNotification::class => ['mail', 'telegram'],
-            \WireNinja\Prasmanan\Notifications\Backup\CleanupWasSuccessfulNotification::class => ['mail', 'telegram'],
+            BackupHasFailedNotification::class => ['mail', 'telegram'],
+            UnhealthyBackupWasFoundNotification::class => ['mail', 'telegram'],
+            CleanupHasFailedNotification::class => ['mail', 'telegram'],
+            BackupWasSuccessfulNotification::class => ['mail', 'telegram'],
+            HealthyBackupWasFoundNotification::class => ['mail', 'telegram'],
+            CleanupWasSuccessfulNotification::class => ['mail', 'telegram'],
         ],
 
         /*
          * Here you can specify the notifiable to which the notifications should be sent. The default
          * notifiable will use the variables specified in this config file.
          */
-        'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
+        'notifiable' => Notifiable::class,
 
         'mail' => [
             'to' => 'your@example.com',
@@ -278,8 +289,8 @@ return [
             'name' => env('APP_NAME', 'laravel-backup'),
             'disks' => ['local'],
             'health_checks' => [
-                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
-                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
+                MaximumAgeInDays::class => 1,
+                MaximumStorageInMegabytes::class => 5000,
             ],
         ],
 
@@ -305,7 +316,7 @@ return [
          * No matter how you configure it the default strategy will never
          * delete the newest backup.
          */
-        'strategy' => \Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy::class,
+        'strategy' => DefaultStrategy::class,
 
         'default_strategy' => [
             /*

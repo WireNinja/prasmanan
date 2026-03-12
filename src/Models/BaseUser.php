@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WireNinja\Prasmanan\Models;
 
+use App\Models\UserSocialAccount;
 use Filament\Auth\MultiFactor\App\Concerns\InteractsWithAppAuthentication;
 use Filament\Auth\MultiFactor\App\Concerns\InteractsWithAppAuthenticationRecovery;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
@@ -78,7 +79,7 @@ abstract class BaseUser extends Authenticatable implements FilamentUser, HasAppA
      */
     public function socialAccounts(): HasMany
     {
-        return $this->hasMany(config('prasmanan.models.social_account', \App\Models\UserSocialAccount::class));
+        return $this->hasMany(config('prasmanan.models.social_account', UserSocialAccount::class));
     }
 
     /**

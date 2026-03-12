@@ -6,7 +6,6 @@ namespace WireNinja\Prasmanan\Console\Commands\System;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use WireNinja\Prasmanan\Supports\PrasmananConstants;
 
 final class AuditCommand extends Command
 {
@@ -39,6 +38,7 @@ final class AuditCommand extends Command
 
         if ($hasFailures) {
             $this->components->error('Audit found issues that need attention! Run "php artisan prasmanan:init" to fix missing files/configs.');
+
             return self::FAILURE;
         }
 
@@ -58,7 +58,7 @@ final class AuditCommand extends Command
                 $row['category'],
                 $row['component'],
                 $status,
-                $row['detail']
+                $row['detail'],
             ];
         }, $this->results);
 
@@ -131,6 +131,7 @@ final class AuditCommand extends Command
         $envPath = base_path('.env');
         if (! File::exists($envPath)) {
             $this->addResult('Env', '.env File', false, 'Missing .env file!');
+
             return;
         }
 
@@ -162,6 +163,7 @@ final class AuditCommand extends Command
         $file = base_path('vite.config.js');
         if (! File::exists($file)) {
             $this->addResult('Vite', 'Config Integrity', false, 'File missing');
+
             return;
         }
 
@@ -215,6 +217,7 @@ final class AuditCommand extends Command
         $file = base_path('bootstrap/app.php');
         if (! File::exists($file)) {
             $this->addResult('Bootstrap', 'App Blueprint', false, 'Missing bootstrap/app.php');
+
             return;
         }
 

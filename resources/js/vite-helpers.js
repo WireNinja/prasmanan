@@ -49,7 +49,6 @@ export const commonWatchExclusions = [
     "**/vendor/**",
     "**/node_modules/**",
     "**/docs/**",
-    "**/packages/**",
     "**/database/**",
     "**/config/**",
     "**/bootstrap/**",

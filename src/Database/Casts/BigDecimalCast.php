@@ -31,29 +31,39 @@ class BigDecimalCast implements CastsAttributes
     ) {
         $this->scale = $scale !== null && $scale !== '' ? (int) $scale : null;
 
+        /*
+    |--------------------------------------------------------------------------
+    | Konversi String → Unit Enum RoundingMode (Safe dengan Fallback)
+    |--------------------------------------------------------------------------
+    |
+    | Jika string yang dikirim tidak valid (typo di definisi cast Model),
+    | kita TIDAK mau crash seluruh request — tapi kita HARUS tahu kejadiannya.
+    |
+    | rescue() menjamin dua hal sekaligus:
+    |   1. Exception tetap dilaporkan ke Laravel Nightwatch / log
+    |   2. Fallback ke HalfUp agar aplikasi tetap berjalan
+    |
+    | Ini lebih baik dari throw langsung di constructor karena Cast dipanggil
+    | saat Model di-instantiate — crash di sini bisa mematikan banyak hal.
+    |
+    */
         if ($roundingMode instanceof RoundingMode) {
             $this->roundingMode = $roundingMode;
         } else {
-            /*
-        |----------------------------------------------------------------------
-        | Resolve RoundingMode dari string
-        |----------------------------------------------------------------------
-        |
-        | Jika string tidak valid, THROW — jangan fallback diam-diam.
-        | Typo di cast definition harus ketahuan saat development, bukan
-        | saat data sudah salah di production.
-        |
-        */
-            $mode = strtoupper($roundingMode);
-            $constantName = RoundingMode::class . "::$mode";
+            /** @var array<string, RoundingMode> $lookup */
+            $lookup = array_column(RoundingMode::cases(), null, 'name');
+            $normalized = strtoupper($roundingMode);
 
-            if (! defined($constantName)) {
-                throw new InvalidArgumentException(
-                    sprintf('RoundingMode "%s" tidak valid. Gunakan: HALF_UP, DOWN, UP, dll.', $roundingMode)
-                );
-            }
-
-            $this->roundingMode = to_enum_strict(RoundingMode::class, constant($constantName));
+            $this->roundingMode = rescue(
+                fn() => $lookup[$normalized] ?? throw new InvalidArgumentException(
+                    sprintf(
+                        'RoundingMode "%s" tidak valid. Pilihan yang tersedia: %s.',
+                        $roundingMode,
+                        implode(', ', array_keys($lookup)),
+                    )
+                ),
+                RoundingMode::HalfUp,
+            );
         }
     }
 

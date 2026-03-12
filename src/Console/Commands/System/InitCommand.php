@@ -54,7 +54,7 @@ final class InitCommand extends Command
             $content = File::get($envPath);
             $content = preg_replace('/^APP_LOCALE=en$/m', 'APP_LOCALE=id', $content);
             $content = preg_replace('/^LOG_STACK=single$/m', 'LOG_STACK=daily', $content);
-            
+
             return File::put($envPath, $content) !== false;
         });
     }
@@ -71,9 +71,9 @@ final class InitCommand extends Command
             $modified = false;
 
             $replacements = [
-                '/^REVERB_APP_ID=$/m' => 'REVERB_APP_ID=' . random_int(100000, 999999),
-                '/^REVERB_APP_KEY=$/m' => 'REVERB_APP_KEY=' . bin2hex(random_bytes(10)),
-                '/^REVERB_APP_SECRET=$/m' => 'REVERB_APP_SECRET=' . bin2hex(random_bytes(15)),
+                '/^REVERB_APP_ID=$/m' => 'REVERB_APP_ID='.random_int(100000, 999999),
+                '/^REVERB_APP_KEY=$/m' => 'REVERB_APP_KEY='.bin2hex(random_bytes(10)),
+                '/^REVERB_APP_SECRET=$/m' => 'REVERB_APP_SECRET='.bin2hex(random_bytes(15)),
             ];
 
             foreach ($replacements as $pattern => $replacement) {
@@ -133,7 +133,7 @@ final class InitCommand extends Command
                 'pwa:assets' => 'bun pwa-assets-generator --preset minimal public/favicon.svg',
                 'pwa:icons' => 'bun run pwa:iconify && bun run pwa:copy',
                 'pwa:iconify' => 'bun pwa-iconify-fetch.js',
-                'pwa:copy' => 'bun pwa-icons-copy.js'
+                'pwa:copy' => 'bun pwa-icons-copy.js',
             ];
 
             foreach ($scripts as $key => $val) {
@@ -158,7 +158,7 @@ final class InitCommand extends Command
             $dest = base_path($file);
             if (! File::exists($dest) || $this->option('force')) {
                 File::ensureDirectoryExists(dirname($dest));
-                File::copy(PrasmananConstants::stubsDir() . '/' . $stub, $dest);
+                File::copy(PrasmananConstants::stubsDir().'/'.$stub, $dest);
                 $this->line("  <fg=green>Created</> {$file}");
             }
         }
@@ -176,7 +176,7 @@ final class InitCommand extends Command
             $dest = base_path($file);
             if (! File::exists($dest) || $this->option('force')) {
                 File::ensureDirectoryExists(dirname($dest));
-                File::copy(PrasmananConstants::stubsDir() . '/' . $stub, $dest);
+                File::copy(PrasmananConstants::stubsDir().'/'.$stub, $dest);
                 $this->line("  <fg=green>Created</> {$file}");
             }
         }
@@ -189,13 +189,13 @@ final class InitCommand extends Command
             'pwa-iconify-fetch.js.stub' => 'pwa-iconify-fetch.js',
             'pwa-icons-copy.js.stub' => 'pwa-icons-copy.js',
             'pwa-vite.config.stub' => 'pwa-vite.config.ts',
-            'pwa-vite-helpers.js.stub' => 'pwa-vite-helpers.js'
+            'pwa-vite-helpers.js.stub' => 'pwa-vite-helpers.js',
         ];
 
         foreach ($pwaAssets as $stub => $dest) {
-            $src = PrasmananConstants::stubsDir() . '/pwa/' . $stub;
+            $src = PrasmananConstants::stubsDir().'/pwa/'.$stub;
             $dsc = base_path($dest);
-            
+
             if (File::exists($src) && (! File::exists($dsc) || $this->option('force'))) {
                 File::copy($src, $dsc);
                 $this->line("  <fg=green>Created</> {$dest}");
@@ -206,7 +206,7 @@ final class InitCommand extends Command
     private function setupVite(): void
     {
         $vitePath = base_path('vite.config.js');
-        $stubPath = PrasmananConstants::stubsDir() . '/vite.config.js.stub';
+        $stubPath = PrasmananConstants::stubsDir().'/vite.config.js.stub';
 
         if (! File::exists($vitePath)) {
             return;
@@ -227,7 +227,7 @@ final class InitCommand extends Command
     private function setupMigrations(): void
     {
         $migrationsPath = database_path('migrations');
-        $coreMigration = $migrationsPath . '/0000_00_00_000000_create_prasmanan_core_tables.php';
+        $coreMigration = $migrationsPath.'/0000_00_00_000000_create_prasmanan_core_tables.php';
 
         if (File::exists($coreMigration) && ! $this->option('force')) {
             return;
@@ -243,7 +243,8 @@ final class InitCommand extends Command
                     }
                 }
 
-                $stub = PrasmananConstants::stubsDir() . '/create_prasmanan_core_tables.php.stub';
+                $stub = PrasmananConstants::stubsDir().'/create_prasmanan_core_tables.php.stub';
+
                 return File::copy($stub, $coreMigration);
             });
         }
@@ -258,6 +259,7 @@ final class InitCommand extends Command
 
         $this->components->task('Setting up routes/channels.php...', function () use ($path) {
             $content = "<?php\n\nuse Illuminate\Support\Facades\Broadcast;\nuse WireNinja\Prasmanan\Broadcasting\PrasmananBroadcast;\n\nPrasmananBroadcast::all();\n";
+
             return File::put($path, $content) !== false;
         });
     }
@@ -271,7 +273,7 @@ final class InitCommand extends Command
 
         $this->components->task('Configuring bootstrap/app.php...', function () use ($path) {
             $content = File::get($path);
-            
+
             // Channels
             if (! str_contains($content, 'withChannels') && ! str_contains($content, 'channels:')) {
                 // Try to find console.php routes and append channels
@@ -320,7 +322,7 @@ final class InitCommand extends Command
             $dest = base_path($file);
             if (! File::exists($dest) || $this->option('force')) {
                 File::ensureDirectoryExists(dirname($dest));
-                File::copy(PrasmananConstants::stubsDir() . '/' . $stub, $dest);
+                File::copy(PrasmananConstants::stubsDir().'/'.$stub, $dest);
                 $this->line("  <fg=green>Created</> {$file}");
             }
         }
@@ -331,8 +333,8 @@ final class InitCommand extends Command
         $dest = base_path('resources/js/sw.js');
         if (! File::exists($dest) || $this->option('force')) {
             File::ensureDirectoryExists(dirname($dest));
-            File::copy(PrasmananConstants::stubsDir() . '/js/sw.js.stub', $dest);
-            $this->line("  <fg=green>Created</> resources/js/sw.js");
+            File::copy(PrasmananConstants::stubsDir().'/js/sw.js.stub', $dest);
+            $this->line('  <fg=green>Created</> resources/js/sw.js');
         }
     }
 
@@ -353,7 +355,7 @@ final class InitCommand extends Command
                 '',
                 "BackupDatabaseSchedule::make()->dailyAt('02:00')->runInBackground();",
                 "BackupAssetsSchedule::make()->dailyAt('02:00')->runInBackground();",
-                "CleanupBackupSchedule::make()->daily()->runInBackground();",
+                'CleanupBackupSchedule::make()->daily()->runInBackground();',
             ];
 
             foreach ($schedules as $line) {
@@ -372,17 +374,19 @@ final class InitCommand extends Command
             // Inject after the last use statement or after <?php
             if (preg_match_all('/^use\s+.*;/m', $content, $matches)) {
                 $lastUse = end($matches[0]);
-                return str_replace($lastUse, $lastUse . "\n" . $line, $content);
+
+                return str_replace($lastUse, $lastUse."\n".$line, $content);
             }
-            return str_replace("<?php\n", "<?php\n\n" . $line . "\n", $content);
+
+            return str_replace("<?php\n", "<?php\n\n".$line."\n", $content);
         }
 
         // Inject before Artisan::command
         if (str_contains($content, 'Artisan::command')) {
-            return str_replace('Artisan::command', $line . "\n\nArtisan::command", $content);
+            return str_replace('Artisan::command', $line."\n\nArtisan::command", $content);
         }
 
-        return $content . "\n" . $line . "\n";
+        return $content."\n".$line."\n";
     }
 
     private function setupStorageLink(): void
@@ -403,6 +407,7 @@ final class InitCommand extends Command
         $this->components->task('Setting up Indonesian language...', function () {
             $this->callSilent('lang:add', ['locales' => ['id']]);
             $this->callSilent('lang:update');
+
             return true;
         });
     }

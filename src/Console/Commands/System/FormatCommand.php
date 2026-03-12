@@ -6,7 +6,6 @@ namespace WireNinja\Prasmanan\Console\Commands\System;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Process\Process;
-
 use WireNinja\Prasmanan\Supports\PrasmananConstants;
 
 final class FormatCommand extends Command
@@ -19,10 +18,10 @@ final class FormatCommand extends Command
     {
         $this->components->info('Running Prasmanan Code Formatter (Pint)...');
 
-        $configPath = PrasmananConstants::configsDir() . '/pint.json';
+        $configPath = PrasmananConstants::configsDir().'/pint.json';
         $binaryPath = base_path('vendor/bin/pint');
 
-        if (!file_exists($binaryPath)) {
+        if (! file_exists($binaryPath)) {
             $this->components->error('Pint binary not found in vendor/bin/pint. Please run composer install.');
 
             return self::FAILURE;

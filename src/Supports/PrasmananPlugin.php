@@ -9,19 +9,13 @@ use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 
-class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
+class PrasmananPlugin implements EventSubscriberInterface, PluginInterface
 {
-    public function activate(Composer $composer, IOInterface $io): void
-    {
-    }
+    public function activate(Composer $composer, IOInterface $io): void {}
 
-    public function deactivate(Composer $composer, IOInterface $io): void
-    {
-    }
+    public function deactivate(Composer $composer, IOInterface $io): void {}
 
-    public function uninstall(Composer $composer, IOInterface $io): void
-    {
-    }
+    public function uninstall(Composer $composer, IOInterface $io): void {}
 
     public static function getSubscribedEvents(): array
     {
@@ -44,11 +38,11 @@ class PrasmananPlugin implements PluginInterface, EventSubscriberInterface
         $baseDir = getcwd();
 
         foreach ($directories as $dir) {
-            $path = $baseDir . DIRECTORY_SEPARATOR . $dir;
+            $path = $baseDir.DIRECTORY_SEPARATOR.$dir;
 
             if (! is_dir($path)) {
                 if (@mkdir($path, 0755, true)) {
-                    @file_put_contents($path . DIRECTORY_SEPARATOR . '.gitkeep', '');
+                    @file_put_contents($path.DIRECTORY_SEPARATOR.'.gitkeep', '');
                 }
             }
         }

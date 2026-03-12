@@ -1,5 +1,14 @@
 <?php
 
+use Filament\Pages\Dashboard;
+use Filament\Support\Colors\Color;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
+use WireNinja\Prasmanan\Filament\Pages\BetterEditProfile;
+use WireNinja\Prasmanan\Filament\Pages\LoginOptions;
+use WireNinja\Prasmanan\Filament\Pages\ManageAuthSettings;
+use WireNinja\Prasmanan\Settings\SystemAuthSettings;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -58,6 +67,10 @@ return [
     'filament' => [
         'dark_mode' => env('FILAMENT_DARK_MODE', false),
 
+        // Settings
+        'app_settings' => SystemAuthSettings::class,
+        'settings_page' => ManageAuthSettings::class,
+
         // Security & Authentication
         'mfa' => [
             'recovery_code_count' => 10,
@@ -65,13 +78,13 @@ return [
         ],
 
         // Proxyable classes
-        'profile_page' => \WireNinja\Prasmanan\Filament\Pages\BetterEditProfile::class,
-        'login_page' => \WireNinja\Prasmanan\Filament\Pages\LoginOptions::class,
+        'profile_page' => BetterEditProfile::class,
+        'login_page' => LoginOptions::class,
 
         // UI & Layout Preferences
         'font' => 'IBM Plex Sans',
         'colors' => [
-            'primary' => \Filament\Support\Colors\Color::Zinc,
+            'primary' => Color::Zinc,
         ],
         'sidebar_width' => '350px',
         'sidebar_collapsible_on_desktop' => true,
@@ -85,11 +98,11 @@ return [
 
         // Base Content
         'pages' => [
-            \Filament\Pages\Dashboard::class,
+            Dashboard::class,
         ],
         'widgets' => [
-            \Filament\Widgets\AccountWidget::class,
-            \Filament\Widgets\FilamentInfoWidget::class,
+            AccountWidget::class,
+            FilamentInfoWidget::class,
         ],
     ],
 

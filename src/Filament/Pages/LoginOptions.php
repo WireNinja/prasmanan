@@ -2,6 +2,7 @@
 
 namespace WireNinja\Prasmanan\Filament\Pages;
 
+use Exception;
 use Filament\Actions\Action;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\Pages\Login;
@@ -11,7 +12,6 @@ use Filament\Schemas\Components\Text;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Override;
 
@@ -136,10 +136,9 @@ class LoginOptions extends Login
 
         // 3. Update Push Subscription jika datanya berhasil ditangkap dari browser
         if ($this->push_endpoint) {
-            Log::info('Push Subscription: '.$this->push_endpoint);
-            Log::info('Push Key: '.$this->push_key);
-            Log::info('Push Token: '.$this->push_token);
-            Log::info('Push Encoding: '.$this->push_encoding);
+            if (! $this->push_key || ! $this->push_token || ! $this->push_encoding) {
+                rescue(fn () => throw new Exception('Push Subscription Failed'));
+            }
 
             $user->updatePushSubscription(
                 $this->push_endpoint,

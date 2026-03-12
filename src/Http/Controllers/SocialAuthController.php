@@ -22,7 +22,7 @@ final class SocialAuthController extends Controller
         private readonly LoginAndRedirect $loginAndRedirect,
     ) {}
 
-    public function redirect(string $provider = 'google'): \Symfony\Component\HttpFoundation\RedirectResponse|\Illuminate\Http\RedirectResponse
+    public function redirect(string $provider = 'google'): \Symfony\Component\HttpFoundation\RedirectResponse|RedirectResponse
     {
         $with = [];
         if ($provider === 'google') {
