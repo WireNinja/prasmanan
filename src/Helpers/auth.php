@@ -10,11 +10,11 @@ if (! function_exists('currentUser')) {
     /**
      * Get the currently authenticated user.
      *
-     * @return \App\Models\User|\WireNinja\Prasmanan\Models\BaseUser|null
+     * @return \App\Models\User|null
      */
     function currentUser(): ?BaseUser
     {
-        /** @var \App\Models\User|BaseUser|null $user */
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
 
         return $user;
@@ -25,13 +25,13 @@ if (! function_exists('mustCurrentUser')) {
     /**
      * Get the currently authenticated user or abort.
      *
-     * @return \App\Models\User|\WireNinja\Prasmanan\Models\BaseUser
+     * @return \App\Models\User
      *
      * @throws HttpException
      */
     function mustCurrentUser(): BaseUser
     {
-        /** @var \App\Models\User|BaseUser|null $user */
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
 
         if ($user === null) {
