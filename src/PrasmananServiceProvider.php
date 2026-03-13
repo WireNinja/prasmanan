@@ -86,6 +86,11 @@ final class PrasmananServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../stubs/create_prasmanan_core_tables.php.stub' => database_path('migrations/'.date('Y_m_d_His', time()).'_create_prasmanan_core_tables.php'),
             ], 'prasmanan-migrations');
+
+            $this->publishes([
+                __DIR__.'/../stubs/js/app.js.stub' => base_path('resources/js/app.js'),
+                __DIR__.'/../stubs/pwa/pwa.js.stub' => base_path('resources/js/pwa.js'),
+            ], 'prasmanan-js');
         }
     }
 
