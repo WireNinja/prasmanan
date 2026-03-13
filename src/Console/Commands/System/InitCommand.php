@@ -43,6 +43,7 @@ final class InitCommand extends Command
         $this->setupEnums();
         $this->setupPwaAssets();
         $this->setupVite();
+        $this->setupAppJs();
         $this->setupMigrations();
         $this->setupBroadcasting();
         $this->setupBootstrap();
@@ -69,8 +70,15 @@ final class InitCommand extends Command
 
         $this->components->task('Updating .env (Locale & Logging)...', function () use ($envPath) {
             $content = File::get($envPath);
-            $content = preg_replace('/^APP_LOCALE=en$/m', 'APP_LOCALE=id', $content);
-            $content = preg_replace('/^LOG_STACK=single$/m', 'LOG_STACK=daily', $content);
+            $force = $this->option('force-core') || $this->option('all-force');
+
+            if ($force) {
+                $content = preg_replace('/^APP_LOCALE=.*$/m', 'APP_LOCALE=id', $content);
+                $content = preg_replace('/^LOG_STACK=.*$/m', 'LOG_STACK=daily', $content);
+            } else {
+                $content = preg_replace('/^APP_LOCALE=en$/m', 'APP_LOCALE=id', $content);
+                $content = preg_replace('/^LOG_STACK=single$/m', 'LOG_STACK=daily', $content);
+            }
 
             return File::put($envPath, $content) !== false;
         });
@@ -86,14 +94,23 @@ final class InitCommand extends Command
         $this->components->task('Generating Reverb keys...', function () use ($envPath) {
             $content = File::get($envPath);
             $modified = false;
+            $force = $this->option('force-core') || $this->option('all-force');
 
             $replacements = [
+                '/^REVERB_APP_ID=.*$/m' => 'REVERB_APP_ID='.random_int(100000, 999999),
+                '/^REVERB_APP_KEY=.*$/m' => 'REVERB_APP_KEY='.bin2hex(random_bytes(10)),
+                '/^REVERB_APP_SECRET=.*$/m' => 'REVERB_APP_SECRET='.bin2hex(random_bytes(15)),
+            ];
+
+            $defaults = [
                 '/^REVERB_APP_ID=$/m' => 'REVERB_APP_ID='.random_int(100000, 999999),
                 '/^REVERB_APP_KEY=$/m' => 'REVERB_APP_KEY='.bin2hex(random_bytes(10)),
                 '/^REVERB_APP_SECRET=$/m' => 'REVERB_APP_SECRET='.bin2hex(random_bytes(15)),
             ];
 
-            foreach ($replacements as $pattern => $replacement) {
+            $activeReplacements = $force ? $replacements : $defaults;
+
+            foreach ($activeReplacements as $pattern => $replacement) {
                 if (preg_match($pattern, $content)) {
                     $content = preg_replace($pattern, $replacement, $content);
                     $modified = true;
@@ -112,7 +129,9 @@ final class InitCommand extends Command
         }
 
         $content = File::get($envPath);
-        if (str_contains($content, 'VAPID_PUBLIC_KEY=') && ! empty(trim(explode('=', explode("\n", substr($content, strpos($content, 'VAPID_PUBLIC_KEY=')))[0])[1] ?? ''))) {
+        $force = $this->option('force-core') || $this->option('all-force');
+        
+        if (! $force && str_contains($content, 'VAPID_PUBLIC_KEY=') && ! empty(trim(explode('=', explode("\n", substr($content, strpos($content, 'VAPID_PUBLIC_KEY=')))[0])[1] ?? ''))) {
             // Check if it's really set (not just the key name)
             preg_match('/^VAPID_PUBLIC_KEY=(.+)$/m', $content, $matches);
             if (! empty($matches[1])) {
@@ -146,15 +165,23 @@ final class InitCommand extends Command
             }
 
             $scripts = [
-                'iconify:fetch' => 'bun pwa-iconify-fetch.js',
-                'pwa:assets' => 'bun pwa-assets-generator --preset minimal public/favicon.svg',
-                'pwa:icons' => 'bun run pwa:iconify && bun run pwa:copy',
-                'pwa:iconify' => 'bun pwa-iconify-fetch.js',
+                'pwa:assets' => 'bun pwa-assets-generator',
                 'pwa:copy' => 'bun pwa-icons-copy.js',
+                'pwa:iconify' => 'bun pwa-iconify-fetch.js',
             ];
 
+            $force = $this->option('force-core') || $this->option('all-force');
+            $updated = false;
+
             foreach ($scripts as $key => $val) {
-                $package['scripts'][$key] = $val;
+                if (! isset($package['scripts'][$key]) || $force) {
+                    $package['scripts'][$key] = $val;
+                    $updated = true;
+                }
+            }
+
+            if (! $updated) {
+                return true;
             }
 
             return File::put($path, json_encode($package, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) !== false;
@@ -289,6 +316,23 @@ final class InitCommand extends Command
         }
     }
 
+    private function setupAppJs(): void
+    {
+        if (! $this->option('core') && ! $this->option('all-force')) {
+            return;
+        }
+
+        $dest = base_path('resources/js/app.js');
+        $stub = PrasmananConstants::stubsDir().'/js/app.js.stub';
+        $force = $this->option('force-core') || $this->option('all-force');
+
+        if (! File::exists($dest) || $force) {
+            File::ensureDirectoryExists(dirname($dest));
+            File::copy($stub, $dest);
+            $this->line('  <fg=green>'.(File::exists($dest) ? 'Updated' : 'Created').'</> resources/js/app.js');
+        }
+    }
+
     private function setupMigrations(): void
     {
         if (! $this->option('core') && ! $this->option('all-force')) {
@@ -349,9 +393,10 @@ final class InitCommand extends Command
 
         $this->components->task('Configuring bootstrap/app.php...', function () use ($path) {
             $content = File::get($path);
+            $force = $this->option('force-core') || $this->option('all-force');
 
             // Channels
-            if (! str_contains($content, 'withChannels') && ! str_contains($content, 'channels:')) {
+            if ($force || (! str_contains($content, 'withChannels') && ! str_contains($content, 'channels:'))) {
                 // Try to find console.php routes and append channels
                 $content = preg_replace(
                     '/commands:\s*__DIR__\s*\.\s*\'\/..\/routes\/console\.php\',?/m',
