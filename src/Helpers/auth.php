@@ -10,11 +10,11 @@ if (! function_exists('currentUser')) {
     /**
      * Get the currently authenticated user.
      *
-     * Returns the authenticated User model or null if not authenticated.
+     * @return \App\Models\User|\WireNinja\Prasmanan\Models\BaseUser|null
      */
     function currentUser(): ?BaseUser
     {
-        /** @var BaseUser|null $user */
+        /** @var \App\Models\User|BaseUser|null $user */
         $user = Auth::user();
 
         return $user;
@@ -25,14 +25,13 @@ if (! function_exists('mustCurrentUser')) {
     /**
      * Get the currently authenticated user or abort.
      *
-     * Returns the authenticated User model or aborts with 401 if not authenticated.
-     * Use this when you need a non-nullable User instance (e.g., for policy checks).
+     * @return \App\Models\User|\WireNinja\Prasmanan\Models\BaseUser
      *
      * @throws HttpException
      */
     function mustCurrentUser(): BaseUser
     {
-        /** @var BaseUser|null $user */
+        /** @var \App\Models\User|BaseUser|null $user */
         $user = Auth::user();
 
         if ($user === null) {
