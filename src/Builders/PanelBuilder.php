@@ -7,6 +7,7 @@ namespace WireNinja\Prasmanan\Builders;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Closure;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
+use Filament\Enums\UserMenuPosition;
 use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -71,13 +72,14 @@ class PanelBuilder
             ->id($this->name)
             ->path($this->name)
             ->viteTheme('resources/css/filament/' . $this->name . '/theme.css')
-            ->brandName(fn (SystemAppSettings $settings) => $settings->getCachedBrandName())
-            ->brandLogo(fn (SystemAppSettings $settings) => $settings->getCachedBrandLogo())
+            ->brandName(fn(SystemAppSettings $settings) => $settings->getCachedBrandName())
+            ->brandLogo(fn(SystemAppSettings $settings) => $settings->getCachedBrandLogo())
             ->login($loginPage)
             ->profile(page: $profilePage, isSimple: false)
             ->darkMode($darkMode)
             ->sidebarWidth($sidebarWidth)
             ->sidebarLivewireComponent(BetterSidebar::class)
+            // ->userMenu(true, UserMenuPosition::Topbar)
             // ->topbarLivewireComponent(BetterTopbar::class)
             ->globalSearch(false)
             ->broadcasting(fn() => config('prasmanan.broadcasting.enabled', false))
@@ -88,7 +90,7 @@ class PanelBuilder
             ->topbar(false)
             ->maxContentWidth(Width::Full)
             ->font(
-                fn (SystemAppSettings $settings) => $settings->getCachedCustomFont(),
+                fn(SystemAppSettings $settings) => $settings->getCachedCustomFont(),
                 provider: GoogleFontProvider::class
             )
             ->discoverResources(

@@ -1,6 +1,4 @@
 @island('better-sidebar')
-    {{-- @persist('sidebar-' . filament()->getId()) --}}
-    {{-- @endpersist --}}
     <div>
         @php
             $navigation = filament()->getNavigation();
@@ -73,7 +71,7 @@
                         @endif
 
                         @if ($hasUserMenu)
-                            <x-filament-panels::user-menu position="left-rail" />
+                            <x-prasmanan::user-menu position="left-rail" />
                         @endif
                     </div>
                 @endif
