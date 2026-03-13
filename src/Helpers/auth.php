@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use WireNinja\Prasmanan\Models\BaseUser;
 
 if (! function_exists('currentUser')) {
     /**
@@ -12,7 +11,7 @@ if (! function_exists('currentUser')) {
      *
      * @return \App\Models\User|null
      */
-    function currentUser(): ?BaseUser
+    function currentUser()
     {
         /** @var \App\Models\User|null $user */
         $user = Auth::user();
@@ -29,7 +28,7 @@ if (! function_exists('mustCurrentUser')) {
      *
      * @throws HttpException
      */
-    function mustCurrentUser(): BaseUser
+    function mustCurrentUser()
     {
         /** @var \App\Models\User|null $user */
         $user = Auth::user();
