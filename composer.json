@@ -40,7 +40,8 @@
         "meilisearch/meilisearch-php": "^1.16",
         "http-interop/http-factory-guzzle": "^1.2",
         "laravel/reverb": "^1.8",
-        "picqer/php-barcode-generator": "^3.2"
+        "picqer/php-barcode-generator": "^3.2",
+        "stechstudio/filament-impersonate": "^5.1"
     },
     "require-dev": {
         "composer/composer": "^2.0",
