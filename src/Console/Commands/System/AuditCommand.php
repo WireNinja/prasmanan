@@ -32,6 +32,7 @@ final class AuditCommand extends Command
         $this->auditDatabase();
         $this->auditBootstrap();
         $this->auditFolders();
+        $this->auditPackageJson();
         $this->auditSchedules();
         $this->auditPhpConfig();
 
@@ -89,6 +90,8 @@ final class AuditCommand extends Command
             'pwa-icons-copy.js' => 'PWA Icons Copy',
             'pwa-vite-helpers.js' => 'Vite Config Helpers',
             'resources/js/sw.js' => 'PWA Service Worker',
+            'resources/js/pwa.js' => 'PWA Registration Script',
+            'resources/js/app.js' => 'Main App Script',
             'app/Providers/Filament/AdminPanelProvider.php' => 'Admin Panel Provider',
             'resources/css/filament/admin/theme.css' => 'Admin Panel Theme',
             'resources/icons/lucide' => 'Lucide Icons Path',
@@ -265,6 +268,23 @@ final class AuditCommand extends Command
         foreach ($folders as $path => $label) {
             $exists = File::isDirectory(base_path($path));
             $this->addResult('Folders', $label, $exists, $exists ? 'Directory exists' : 'Missing folder');
+        }
+    }
+
+    private function auditPackageJson(): void
+    {
+        $path = base_path('package.json');
+        if (! File::exists($path)) {
+            $this->addResult('Package', 'package.json', false, 'File missing');
+            return;
+        }
+
+        $package = json_decode(File::get($path), true);
+        $scripts = ['pwa:assets', 'pwa:copy', 'pwa:iconify'];
+
+        foreach ($scripts as $script) {
+            $exists = isset($package['scripts'][$script]);
+            $this->addResult('Package', "Script: {$script}", $exists, $exists ? 'Registered' : 'Missing in scripts section');
         }
     }
 
