@@ -32,7 +32,7 @@ Route::prefix('auth/{provider}')->group(function () {
 });
 
 Route::get('/webauthn/login', WebAuthnRedirectController::class)
-    ->name('webauthn.login');
+    ->name('webauthn.login.redirect');
 
 // Register all WebAuthn core routes (challenge, registration, login data)
 WebAuthnRoutes::register(
