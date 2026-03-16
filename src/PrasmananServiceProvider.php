@@ -18,6 +18,7 @@ use WireNinja\Prasmanan\Console\Commands\Scout\ScoutFlushAllCommand;
 use WireNinja\Prasmanan\Console\Commands\Scout\ScoutImportAllCommand;
 use WireNinja\Prasmanan\Console\Commands\Showcase\SendDummyBroadcast;
 use WireNinja\Prasmanan\Console\Commands\System\AuditCommand;
+use WireNinja\Prasmanan\Console\Commands\System\DeployAssetsCommand;
 use WireNinja\Prasmanan\Console\Commands\System\EnvSyncCommand;
 use WireNinja\Prasmanan\Console\Commands\System\FormatCommand;
 use WireNinja\Prasmanan\Console\Commands\System\InitCommand;
@@ -72,6 +73,7 @@ final class PrasmananServiceProvider extends ServiceProvider
                 EnvSyncCommand::class,
                 RefreshCommand::class,
                 FormatCommand::class,
+                DeployAssetsCommand::class,
             ]);
         }
     }
