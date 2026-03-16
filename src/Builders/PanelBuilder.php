@@ -61,12 +61,25 @@ class PanelBuilder
         $pages = config('prasmanan.filament.pages', [Dashboard::class]);
         $widgets = config('prasmanan.filament.widgets', [AccountWidget::class, FilamentInfoWidget::class]);
 
-        /** @var SystemAppSettings $appSettings */
-        $appSettings = app(SystemAppSettings::class);
-        $darkMode = $appSettings->isCachedDarkModeEnabled();
-        $sidebarWidth = $appSettings->getCachedSidebarWidth();
-        $collapsibleNavigationGroups = $appSettings->areCachedNavigationGroupsCollapsible();
-        $sidebarCollapsibleOnDesktop = $appSettings->isCachedSidebarCollapsibleOnDesktop();
+        // Default values as fallback
+        $darkMode = true;
+        $sidebarWidth = '350px';
+        $collapsibleNavigationGroups = true;
+        $sidebarCollapsibleOnDesktop = true;
+
+        // Only try to fetch settings if we are not in a critical CLI command
+        if (! $this->shouldSkipDatabaseAccess()) {
+            try {
+                /** @var SystemAppSettings $appSettings */
+                $appSettings = app(SystemAppSettings::class);
+                $darkMode = $appSettings->isCachedDarkModeEnabled();
+                $sidebarWidth = $appSettings->getCachedSidebarWidth();
+                $collapsibleNavigationGroups = $appSettings->areCachedNavigationGroupsCollapsible();
+                $sidebarCollapsibleOnDesktop = $appSettings->isCachedSidebarCollapsibleOnDesktop();
+            } catch (\Throwable) {
+                // Fallback to defaults if DB/Cache is not ready
+            }
+        }
 
         $this->panel
             ->id($this->name)
@@ -220,5 +233,24 @@ class PanelBuilder
     {
         // Mengubah '/' menjadi '\' dari hasil getNamespaceIn()
         return str_replace('/', '\\', $this->getNamespaceIn());
+    }
+
+    protected function shouldSkipDatabaseAccess(): bool
+    {
+        if (! app()->runningInConsole()) {
+            return false;
+        }
+
+        $argv = implode(' ', $_SERVER['argv'] ?? []);
+
+        return Str::contains($argv, [
+            'package:discover',
+            'migrate',
+            'optimize:clear',
+            'config:cache',
+            'config:clear',
+            'cache:clear',
+            'about',
+        ]);
     }
 }

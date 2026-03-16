@@ -14,16 +14,17 @@ trait HasCustomCache
         return static::group() . '::' . $key;
     }
 
-    /**
-     * Get a setting value with flexible caching.
-     */
     public function getCustomCache(string $key): mixed
     {
-        $cacheKey = $this->getCustomCacheKey($key);
+        try {
+            $cacheKey = $this->getCustomCacheKey($key);
 
-        return Cache::flexible($cacheKey, [10, 60], function () use ($key) {
-            return $this->{$key};
-        });
+            return Cache::flexible($cacheKey, [10, 60], function () use ($key) {
+                return $this->{$key};
+            });
+        } catch (\Throwable) {
+            return $this->{$key} ?? null;
+        }
     }
 
     /**
