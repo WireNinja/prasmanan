@@ -4,6 +4,7 @@ namespace WireNinja\Prasmanan\Settings;
 
 use WireNinja\Prasmanan\Concerns\HasCustomCache;
 use Spatie\LaravelSettings\Settings;
+use Illuminate\Support\Facades\Storage;
 
 class SystemAppSettings extends Settings
 {
@@ -35,7 +36,9 @@ class SystemAppSettings extends Settings
 
     public function getCachedBrandLogo(): ?string
     {
-        return $this->getCustomCache('brand_logo');
+        $logo = $this->getCustomCache('brand_logo');
+        
+        return $logo ? Storage::disk('public')->url($logo) : null;
     }
 
     public function isCachedDarkModeEnabled(): bool
