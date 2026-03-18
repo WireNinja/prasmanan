@@ -9,6 +9,10 @@
 @source "../../packages/prasmanan/src/**/*.php";
 @source "../../packages/prasmanan/resources/views/**/*.blade.php";
 
+/* Vendor Installation (Prasmanan Core) */
+@source "../../vendor/wireninja/prasmanan/src/**/*.php";
+@source "../../vendor/wireninja/prasmanan/resources/views/**/*.blade.php";
+
 /* Vendor & Framework Scans */
 @source "../../vendor/filament/**/*.blade.php";
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
