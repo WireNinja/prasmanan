@@ -14,10 +14,13 @@ use WireNinja\Prasmanan\Settings\SystemAppSettings;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use BackedEnum;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use UnitEnum;
 
 class ManageAppSettings extends SettingsPage
 {
+    use HasPageShield;
+
     protected static string $settings = SystemAppSettings::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'lucide-settings';
@@ -128,7 +131,7 @@ class ManageAppSettings extends SettingsPage
             ->color('warning')
             ->icon('lucide-trash-2')
             ->requiresConfirmation()
-            ->action(fn () => $this->clearCache());
+            ->action(fn() => $this->clearCache());
     }
 
     public function clearCache(): void
