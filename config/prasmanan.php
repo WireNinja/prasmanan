@@ -12,6 +12,8 @@ use WireNinja\Prasmanan\Settings\SystemAppSettings;
 use WireNinja\Prasmanan\Settings\SystemAuthSettings;
 
 return [
+    'is_shared_hosting' => env('PRASMANAN_IS_SHARED_HOSTING', false),
+
     /*
     |--------------------------------------------------------------------------
     | Broadcasting (Laravel Echo) Configuration
