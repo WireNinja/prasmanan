@@ -178,8 +178,8 @@ class ManageAppSettings extends SettingsPage
         // 2. Jalankan Bun asinkron
         $rootPath = base_path();
 
-        // Cari path bun (fallback ke /usr/local/bin/bun jika tidak ada di path sistem)
-        $bunBinary = env('PRASMANAN_BUN_PATH', 'bun');
+        // Cari path bun dari config
+        $bunBinary = config('prasmanan.bun_path');
 
         // Jalankan generator
         $assetsProcess = Process::path($rootPath)->run($bunBinary . ' run pwa:assets');
@@ -253,7 +253,7 @@ class ManageAppSettings extends SettingsPage
 
         foreach ($icons as $filename => $size) {
             $this->resizeImage($fullPath, $pwaIconsPath . '/' . $filename, $size, $size);
-            
+
             // Copy certain files to root public
             if (in_array($filename, ['favicon.ico', 'apple-touch-icon-180x180.png', 'pwa-192x192.png', 'pwa-512x512.png'])) {
                 File::copy($pwaIconsPath . '/' . $filename, public_path($filename));
@@ -309,8 +309,5 @@ class ManageAppSettings extends SettingsPage
                 imagewebp($target, $targetPath, 90);
                 break;
         }
-
-        imagedestroy($source);
-        imagedestroy($target);
     }
 }

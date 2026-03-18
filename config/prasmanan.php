@@ -13,6 +13,7 @@ use WireNinja\Prasmanan\Settings\SystemAuthSettings;
 
 return [
     'is_shared_hosting' => env('PRASMANAN_IS_SHARED_HOSTING', false),
+    'bun_path' => env('PRASMANAN_BUN_PATH', 'bun'),
 
     /*
     |--------------------------------------------------------------------------
