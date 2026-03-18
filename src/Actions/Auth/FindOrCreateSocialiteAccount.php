@@ -32,6 +32,11 @@ final class FindOrCreateSocialiteAccount
         $user = $userModelClass::query()->where('email', $socialiteUser->getEmail())->first();
 
         if (! $user) {
+            // Check if public registration is allowed
+            if (! config('prasmanan.is_public_registration_enabled', false)) {
+                throw new \Exception('Registrasi akun baru melalui Social Auth saat ini tidak diizinkan. Silakan hubungi administrator.');
+            }
+
             /** @var Authenticatable $user */
             $user = $userModelClass::query()->create([
                 'name' => $socialiteUser->getName() ?? $socialiteUser->getNickname() ?? 'User',
