@@ -64,6 +64,7 @@ return [
     */
     'pwa' => [
         'enabled' => env('PRASMANAN_PWA_ENABLED', true),
+        'force_notification' => env('PRASMANAN_PWA_FORCE_NOTIFICATION', false),
     ],
 
     'filament' => [

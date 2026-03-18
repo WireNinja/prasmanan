@@ -1,4 +1,4 @@
-@if(config('prasmanan.pwa.enabled', true))
+@if(config('prasmanan.pwa.enabled', true) && config('prasmanan.pwa.force_notification', false))
 <div 
     x-data="{
         isSubscribed: false,
