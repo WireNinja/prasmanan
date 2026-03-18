@@ -204,7 +204,8 @@ class ManageAppSettings extends SettingsPage
 
     private function overwriteLogoForBun(): void
     {
-        $logoPath = $this->settings->brand_logo;
+        $settings = app(static::$settings);
+        $logoPath = $settings->brand_logo;
         if (!$logoPath) {
             return;
         }
@@ -219,7 +220,7 @@ class ManageAppSettings extends SettingsPage
     private function syncPwaIcons(): void
     {
         /** @var SystemAppSettings $settings */
-        $settings = $this->settings;
+        $settings = app(static::$settings);
         $logoPath = $settings->brand_logo;
 
         if (!$logoPath) {
